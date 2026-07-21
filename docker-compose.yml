@@ -6,9 +6,9 @@ services:
     container_name: kamba-career-tracker
     restart: unless-stopped
     ports:
-      # Expone el puerto 3000 del contenedor en el puerto 3005 local del host.
-      # Tu NGINX del host debe hacer proxy_pass a http://127.0.0.1:3005
-      - "127.0.0.1:3005:3000"
+      # Expone el puerto 3000 del contenedor en el puerto 3005 del host en todas las interfaces de red (0.0.0.0).
+      # Esto te permitirá acceder desde http://192.168.40.10:3005 en tu red local.
+      - "3005:3000"
     volumes:
       # Monta la carpeta data para la base de datos sqlite persistente
       - ./data:/app/data
