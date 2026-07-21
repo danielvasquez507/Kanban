@@ -363,6 +363,8 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   .list-row{grid-template-columns:auto 1fr}
   .list-side{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
   .list-meta{justify-content:flex-start}
+  .col{min-width:95vw;width:95vw}
+  .hide-mobile{display:none!important}
 }
 @media(hover:none){
   .ibtn{opacity:.65;font-size:14px;padding:6px 8px}
