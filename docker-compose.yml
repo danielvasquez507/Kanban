@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  kamba-app:
+    build: .
+    container_name: kamba-career-tracker
+    restart: unless-stopped
+    ports:
+      # Expone el puerto 3000 del contenedor en el puerto 3005 local del host.
+      # Tu NGINX del host debe hacer proxy_pass a http://127.0.0.1:3005
+      - "127.0.0.1:3005:3000"
+    volumes:
+      # Monta la carpeta data para la base de datos sqlite persistente
+      - ./data:/app/data
+      # Si necesitas que el HTML se actualice en vivo sin reconstruir el contenedor:
+      - ./index.html:/app/index.html
+      - ./app.js:/app/app.js
+      - ./style.css:/app/style.css

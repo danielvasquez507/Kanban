@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#060d1c"/>
+<meta name="description" content="Panel de progreso de estudios IT"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Ruta IT"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1730'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='%231e3a5f' stroke-width='3'/%3E%3Cpath d='M14 44 L28 30 L36 38 L50 20' fill='none' stroke='%2322d3ee' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.5'/%3E%3Ccircle cx='14' cy='44' r='5.5' fill='%2334d399'/%3E%3Ccircle cx='28' cy='30' r='5.5' fill='%2322d3ee'/%3E%3Ccircle cx='36' cy='38' r='5.5' fill='%23f472b6'/%3E%3Ccircle cx='50' cy='20' r='5.5' fill='%233b82f6'/%3E%3C/svg%3E"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1730'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='%231e3a5f' stroke-width='3'/%3E%3Cpath d='M14 44 L28 30 L36 38 L50 20' fill='none' stroke='%2322d3ee' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.5'/%3E%3Ccircle cx='14' cy='44' r='5.5' fill='%2334d399'/%3E%3Ccircle cx='28' cy='30' r='5.5' fill='%2322d3ee'/%3E%3Ccircle cx='36' cy='38' r='5.5' fill='%23f472b6'/%3E%3Ccircle cx='50' cy='20' r='5.5' fill='%233b82f6'/%3E%3C/svg%3E"/>
+<title>Ruta de progresión — Panel IT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="kicker" id="envKicker">CARRERA IT · PLAN DE ESTUDIO 2026</p>
+      <div class="title-row">
+        <h1 id="envTitle">Ruta de progresión</h1>
+        <button class="env-switch" id="envSwitchBtn" onclick="openEnvSwitcher()" title="Gestionar entornos" aria-label="Gestionar entornos">🏢</button>
+      </div>
+      <p class="route-line" id="routeLine"></p>
+    </div>
+    <div class="term"><span class="tdots"><i></i><i></i><i></i></span><span id="termText"></span><span class="cursor">▊</span></div>
+  </header>
+
+  <div class="metro" id="metro" aria-hidden="true"></div>
+
+  <section class="stats">
+    <div class="stat" style="--sc:var(--emerald)"><span class="num" id="pctNum">0%</span><span class="lbl">Progreso global</span><span class="sbar"><i id="pctBar"></i></span></div>
+    <div class="stat" style="--sc:var(--cyan)"><span class="num" id="stDone">0/0</span><span class="lbl">Completados</span><span class="sbar"><i id="doneBar"></i></span></div>
+    <div class="stat" style="--sc:var(--amber)"><span class="num" id="stActive">0</span><span class="lbl">En curso</span><span class="sbar"><i id="activeBar"></i></span></div>
+    <div class="stat" style="--sc:var(--blue)">
+      <div class="hours-row"><span class="hours-done" id="hoursDone">0 h</span><span class="hours-sep">/</span><span class="hours-total" id="hoursTotal">0 h</span></div>
+      <span class="lbl">Horas</span><span class="sbar"><i id="hoursBar"></i></span>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <button class="tbtn" onclick="openColModal()">+ Nueva columna</button>
+    <button class="tbtn" id="installBtn" onclick="installApp()" hidden>⬇ Instalar app</button>
+    <span class="toolbar-sep"></span>
+    <button class="tbtn view-btn active" id="viewBoard" onclick="setView('board')">▦ Board</button>
+    <button class="tbtn view-btn" id="viewList" onclick="setView('list')">☰ Lista</button>
+    <span class="toolbar-sep"></span>
+    <button class="tbtn nav-btn" id="navLeft" onclick="scrollBoard(-1)" title="Desplazar a la izquierda">◀</button>
+    <button class="tbtn nav-btn" id="navRight" onclick="scrollBoard(1)" title="Desplazar a la derecha">▶</button>
+  </div>
+  <div class="board-scroll" id="boardScroll"><main class="board" id="board"></main></div>
+  <div class="list-view" id="listView" style="display:none"></div>
+
+  <section class="quotes">
+    <div class="quotes-head"><span>MOTIVACIÓN_DEL_SISTEMA</span><span class="qbar"><i id="qbarFill"></i></span><span>2:00</span></div>
+    <div class="quotes-body"><div class="quote" id="q1"></div><div class="quote" id="q2"></div></div>
+  </section>
+
+  <section class="log collapsed" id="logSection">
+    <div class="log-head">
+      <span>REGISTRO_DE_ACTIVIDAD · tail -f ~/progreso.log</span>
+      <button class="log-toggle" onclick="toggleLog()"><span id="logToggleTxt">▸ Expandir</span></button>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </section>
+</div>
+<div id="toasts"></div>
+
+<!-- POPUP SELECTOR DE ENTORNOS -->
+<div class="modal-overlay" id="envSwitcher">
+  <div class="modal env-switcher-modal">
+    <div class="modal-head"><h3>🏢 Entornos</h3><button class="modal-close" onclick="closeModal('envSwitcher')">✕</button></div>
+    <div class="env-list" id="envList"></div>
+    <div class="env-create-row">
+      <button class="env-create-btn" onclick="closeModal('envSwitcher');openEnvModal()">+ Crear nuevo entorno</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULARIO DE ENTORNO -->
+<div class="modal-overlay" id="envModal">
+  <div class="modal env-form-modal">
+    <div class="modal-head"><h3 id="emTitle">Nuevo entorno</h3><button class="modal-close" onclick="closeModal('envModal')">✕</button></div>
+    <form onsubmit="saveEnv(event)">
+      <input type="hidden" id="fe-id"/>
+      <div class="icon-preview" id="iconPreview">🚀</div>
+      <label>Icono
+        <div class="emoji-row" id="emojiRow"></div>
+      </label>
+      <label>Nombre del entorno * <span class="hint">(título principal)</span><input type="text" id="fe-name" required placeholder="Ej: Ruta de progresión"/></label>
+      <label>Descripción rápida <span class="hint">(siempre en MAYÚSCULAS)</span>
+        <input type="text" id="fe-desc" oninput="previewDesc()" placeholder="EJ: CARRERA IT · PLAN DE ESTUDIO 2026"/>
+        <span class="desc-preview" id="descPreview"></span>
+      </label>
+      <input type="hidden" id="fe-icon" value="🚀"/>
+      <div class="modal-actions">
+        <button type="button" class="btn-del" id="btnDelEnv" onclick="deleteEnv()">Eliminar</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn-cancel" onclick="closeModal('envModal')">Cancelar</button>
+        <button type="submit" class="btn-save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL ITEM (3 pestañas: Detalles · Comentarios · Actividad) -->
+<div class="modal-overlay" id="itemModal">
+  <div class="modal item-modal">
+    <div class="modal-head">
+      <div class="im-head-info"><h3 id="imTitle">Detalle del item</h3><span class="im-state" id="imState"></span></div>
+      <button class="modal-close" onclick="closeModal('itemModal')">✕</button>
+    </div>
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="details" onclick="switchItemTab('details')">📋 Detalles</button>
+      <button type="button" class="tab" data-tab="comments" onclick="switchItemTab('comments')">💬 Comentarios <span class="tab-count" id="commentCount">0</span></button>
+      <button type="button" class="tab" data-tab="activity" onclick="switchItemTab('activity')">📊 Actividad <span class="tab-count" id="activityCount">0</span></button>
+    </div>
+    <form onsubmit="saveItem(event)">
+      <div class="tab-panel active" id="panel-details">
+        <input type="hidden" id="f-id"/>
+        <label>Título *<input type="text" id="f-title" required placeholder="Nombre del curso o skill"/></label>
+        <label>Detalle<textarea id="f-detail" rows="2" placeholder="Descripción breve"></textarea></label>
+        <div class="form-row">
+          <label>Tiempo
+            <div class="stepper">
+              <button type="button" class="step-btn" onclick="stepVal('f-time',-1)">−</button>
+              <input type="number" id="f-time" min="0" step="1" value="3" inputmode="numeric"/>
+              <button type="button" class="step-btn" onclick="stepVal('f-time',1)">+</button>
+              <span class="time-suffix">h</span>
+            </div>
+          </label>
+          <label>Certificación<input type="text" id="f-cert" placeholder="Ej: PL-900"/></label>
+        </div>
+        <div class="form-row">
+          <label>Impacto<select id="f-impact"><option>Medio</option><option>Medio-alto</option><option selected>Alto</option><option>Muy alto</option></select></label>
+          <label>URL<input type="url" id="f-url" placeholder="https://..."/></label>
+        </div>
+        <label>Columna<select id="f-col"></select></label>
+      </div>
+      <div class="tab-panel" id="panel-comments">
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-input-wrap" id="commentInputWrap">
+          <textarea id="f-comment" rows="2" placeholder="Escribe un comentario, nota o avance…"></textarea>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-activity">
+        <div class="activity-list" id="activityList"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-del" id="btnDelItem" onclick="deleteItem()">Eliminar</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn-cancel" onclick="closeModal('itemModal')">Cancelar</button>
+        <button type="button" class="btn-add-comment" id="btnAddComment" onclick="addComment()" style="display:none">＋ Comentario</button>
+        <button type="submit" class="btn-save" id="btnSaveItem">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL COLUMNA -->
+<div class="modal-overlay" id="colModal">
+  <div class="modal modern-modal">
+    <form onsubmit="saveCol(event)" class="modern-form">
+      <input type="hidden" id="fc-id"/>
+      
+      <div class="form-group">
+        <label>Nombre de la columna <span class="req">*</span></label>
+        <input type="text" id="fc-name" required placeholder="Ej: Cloud Computing" class="modern-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Icono <span class="req">*</span></label>
+        <input type="hidden" id="fc-icon" required value="💻" />
+        <div class="modern-icon-grid" id="iconGrid">
+          <span onclick="pickIcon(this, '💻')" class="sel">💻</span><span onclick="pickIcon(this, '📚')">📚</span><span onclick="pickIcon(this, '🎓')">🎓</span><span onclick="pickIcon(this, '💼')">💼</span>
+          <span onclick="pickIcon(this, '📊')">📊</span><span onclick="pickIcon(this, '🚀')">🚀</span><span onclick="pickIcon(this, '💡')">💡</span><span onclick="pickIcon(this, '🔧')">🔧</span>
+          <span onclick="pickIcon(this, '📅')">📅</span><span onclick="pickIcon(this, '📝')">📝</span><span onclick="pickIcon(this, '🎯')">🎯</span><span onclick="pickIcon(this, '📌')">📌</span>
+          <span onclick="pickIcon(this, '⚙️')">⚙️</span><span onclick="pickIcon(this, '🌐')">🌐</span><span onclick="pickIcon(this, '📁')">📁</span><span onclick="pickIcon(this, '📈')">📈</span>
+          <span onclick="pickIcon(this, '🎨')">🎨</span><span onclick="pickIcon(this, '🧠')">🧠</span><span onclick="pickIcon(this, '🏆')">🏆</span><span onclick="pickIcon(this, '🛡️')">🛡️</span>
+          <span onclick="pickIcon(this, '⚡')">⚡</span><span onclick="pickIcon(this, '🗂️')">🗂️</span><span onclick="pickIcon(this, '📱')">📱</span><span onclick="pickIcon(this, '🤖')">🤖</span>
+          <span onclick="pickIcon(this, '📡')">📡</span><span onclick="pickIcon(this, '🔐')">🔐</span><span onclick="pickIcon(this, '🔗')">🔗</span><span onclick="pickIcon(this, '🏠')">🏠</span>
+          <span onclick="pickIcon(this, '👦🏽')">👦🏽</span><span onclick="pickIcon(this, '🐶')">🐶</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Color representativo <span class="hint">(Libres resaltados)</span></label>
+        <div class="modern-swatches" id="swatches"></div>
+      </div>
+
+      <div class="modal-actions modern-actions">
+        <button type="button" class="btn-del" id="btnDelCol" onclick="deleteCol()">Eliminar</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn-cancel" onclick="closeModal('colModal')">Cancelar</button>
+        <button type="submit" class="btn-save modern-btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
