@@ -9,6 +9,46 @@ const helmet = require('helmet');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Load .env natively (Zero Dependencies)
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  const envConfig = fs.readFileSync(envPath, 'utf-8');
+  envConfig.split('\n').forEach(line => {
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (match) process.env[match[1].trim()] = match[2].trim();
+  });
+}
+const MASTER_PWD = process.env.MASTER_PWD || '3.3.3.';
+
+const sessions = new Map();
+const SESSION_DURATION = 20 * 60 * 1000; // 20 minutes
+
+const parseCookies = (req) => {
+  const list = {};
+  const rc = req.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach((cookie) => {
+      const parts = cookie.split('=');
+      list[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+  }
+  return list;
+};
+
+const requireAuth = (req, res, next) => {
+  const cookies = parseCookies(req);
+  const token = cookies.auth_token;
+  if (!token || !sessions.has(token)) return res.status(401).json({error: 'Unauthorized'});
+  
+  const lastActive = sessions.get(token);
+  if (Date.now() - lastActive > SESSION_DURATION) {
+    sessions.delete(token);
+    return res.status(401).json({error: 'Session expired'});
+  }
+  sessions.set(token, Date.now());
+  next();
+};
+
 // Security Middleware (Ligero)
 app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -66,7 +106,8 @@ const initDb = () => {
       action TEXT NOT NULL DEFAULT '',
       time_h INTEGER NOT NULL DEFAULT 0 CHECK (time_h >= 0),
       cert TEXT NOT NULL DEFAULT '—',
-      impact TEXT NOT NULL DEFAULT 'Alto' CHECK (impact IN ('Medio','Medio-alto','Alto','Muy alto')),
+      platform TEXT NOT NULL DEFAULT '',
+      impact TEXT NOT NULL DEFAULT '' CHECK (impact IN ('','Bajo','Medio','Alto','Muy alto')),
       url TEXT NOT NULL DEFAULT '',
       state INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2)),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -95,6 +136,35 @@ initDb();
 // ---------------------------------------------------------
 // API ENDPOINTS
 // ---------------------------------------------------------
+
+// Proteger todas las rutas /api excepto login
+app.use('/api', (req, res, next) => {
+  if (req.path === '/login' || req.path === '/logout') return next();
+  requireAuth(req, res, next);
+});
+
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  if (password === MASTER_PWD) {
+    const token = crypto.randomBytes(32).toString('hex');
+    sessions.set(token, Date.now());
+    res.cookie('auth_token', token, { httpOnly: true, maxAge: SESSION_DURATION, sameSite: 'strict' });
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: 'Contraseña incorrecta' });
+  }
+});
+
+app.post('/api/logout', (req, res) => {
+  const token = parseCookies(req).auth_token;
+  if (token) sessions.delete(token);
+  res.clearCookie('auth_token');
+  res.json({ success: true });
+});
+
+app.get('/api/check-session', (req, res) => {
+  res.json({ success: true });
+});
 
 const generateId = () => crypto.randomUUID();
 
@@ -243,16 +313,16 @@ app.delete('/api/columns/:id', (req, res) => {
 // POST /api/columns/:id/items
 app.post('/api/columns/:id/items', (req, res) => {
   const column_id = req.params.id;
-  const { title, detail = '', action = '', time = 0, cert = '—', impact = 'Alto', url = '', state = 0 } = req.body;
+  const { title, detail = '', action = '', time = 0, cert = '—', platform = '', impact = '', url = '', state = 0 } = req.body;
   const time_h = time;
   if (!title) return res.status(400).json({ error: 'Title is required' });
 
   const id = generateId();
   try {
-    db.prepare(`INSERT INTO items (id, column_id, title, detail, action, time_h, cert, impact, url, state) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(id, column_id, title, detail, action, time_h, cert, impact, url, state);
-    res.status(201).json({ id, column_id, title, detail, action, time_h, cert, impact, url, state });
+    db.prepare(`INSERT INTO items (id, column_id, title, detail, action, time_h, cert, platform, impact, url, state) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(id, column_id, title, detail, action, time_h, cert, platform, impact, url, state);
+    res.status(201).json({ id, column_id, title, detail, action, time_h, cert, platform, impact, url, state });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -261,7 +331,7 @@ app.post('/api/columns/:id/items', (req, res) => {
 // PATCH /api/items/:id
 app.patch('/api/items/:id', (req, res) => {
   const { id } = req.params;
-  const { title, detail, action, time, cert, impact, url, col } = req.body;
+  const { title, detail, action, time, cert, platform, impact, url, col } = req.body;
   const time_h = time;
   const column_id = col || req.body.column_id;
   
@@ -275,11 +345,12 @@ app.patch('/api/items/:id', (req, res) => {
                 action = COALESCE(?, action), 
                 time_h = COALESCE(?, time_h), 
                 cert = COALESCE(?, cert), 
+                platform = COALESCE(?, platform),
                 impact = COALESCE(?, impact), 
                 url = COALESCE(?, url),
                 column_id = COALESCE(?, column_id)
                 WHERE id = ?`)
-      .run(title, detail, action, time_h, cert, impact, url, column_id, id);
+      .run(title, detail, action, time_h, cert, platform, impact, url, column_id, id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

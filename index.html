@@ -19,7 +19,24 @@
 </head>
 <body>
 <div class="glow g1"></div><div class="glow g2"></div>
-<div class="wrap">
+<div class="login-wrap" id="loginWrap">
+  <div class="login-modal modal">
+    <div class="modal-head">
+      <h3>Acceso Restringido</h3>
+    </div>
+    <form id="loginForm" onsubmit="login(event)">
+      <div style="text-align:center;font-size:32px;margin:10px 0">🔒</div>
+      <label for="f-login-pwd">Contraseña maestra
+        <input type="password" id="f-login-pwd" required placeholder="••••••••">
+      </label>
+      <div id="loginError" style="color:var(--red);font-size:12px;text-align:center;display:none;margin-top:-5px"></div>
+      <button type="submit" class="btn-save" style="margin-top:10px">Entrar</button>
+    </form>
+  </div>
+  <div style="position:absolute;bottom:10px;right:15px;color:var(--muted);font-size:11px;font-family:var(--mono);opacity:0.5">v0.1.26</div>
+</div>
+
+<div class="wrap" id="appWrap" style="display:none">
   <header>
     <div>
       <p class="kicker" id="envKicker">CARRERA IT · PLAN DE ESTUDIO 2026</p>
@@ -27,7 +44,6 @@
         <h1 id="envTitle">Ruta de progresión</h1>
         <button class="env-switch" id="envSwitchBtn" onclick="openEnvSwitcher()" title="Gestionar entornos" aria-label="Gestionar entornos">🏢</button>
       </div>
-      <p class="route-line" id="routeLine"></p>
     </div>
     <div class="term"><span class="tdots"><i></i><i></i><i></i></span><span id="termText"></span><span class="cursor">▊</span></div>
   </header>
@@ -46,16 +62,23 @@
 
   <div class="toolbar">
     <button class="tbtn" onclick="openColModal()">+ <span class="hide-mobile">Nueva </span>Columna</button>
-    <button class="tbtn" id="installBtn" onclick="installApp()" hidden>⬇ Instalar app</button>
     <span class="toolbar-sep"></span>
     <button class="tbtn view-btn active" id="viewBoard" onclick="setView('board')">▦ Board</button>
     <button class="tbtn view-btn" id="viewList" onclick="setView('list')">☰ Lista</button>
     <span class="toolbar-sep"></span>
     <button class="tbtn nav-btn" id="navLeft" onclick="scrollBoard(-1)" title="Desplazar a la izquierda">◀</button>
     <button class="tbtn nav-btn" id="navRight" onclick="scrollBoard(1)" title="Desplazar a la derecha">▶</button>
+    <button class="tbtn" id="installBtn" onclick="installApp()" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Instalar app</button>
+    <button class="tbtn" onclick="logout()" title="Cerrar sesión" style="color:var(--red);margin-left:4px">✕ Salir</button>
   </div>
   <div class="board-scroll" id="boardScroll"><main class="board" id="board"></main></div>
   <div class="list-view" id="listView" style="display:none"></div>
+  <div class="not-found-view" id="notFoundView" style="display:none">
+    <span class="error-code">Error 404</span>
+    <h1>¡Vaya! Página no encontrada</h1>
+    <p>El entorno que buscas no existe o ha sido eliminado de tu ruta de progresión.</p>
+    <button type="button" class="btn-save" onclick="goHome()">Volver al inicio</button>
+  </div>
 
   <section class="quotes">
     <div class="quotes-head"><span>MOTIVACIÓN_DEL_SISTEMA</span><span class="qbar"><i id="qbarFill"></i></span><span>2:00</span></div>
@@ -86,15 +109,17 @@
 <!-- FORMULARIO DE ENTORNO -->
 <div class="modal-overlay" id="envModal">
   <div class="modal env-form-modal">
-    <div class="modal-head"><h3 id="emTitle">Nuevo entorno</h3><button class="modal-close" onclick="closeModal('envModal')">✕</button></div>
+    <div class="modal-head">
+      <h3 id="emTitle">Nuevo entorno</h3>
+    </div>
     <form onsubmit="saveEnv(event)">
       <input type="hidden" id="fe-id"/>
       <div class="icon-preview" id="iconPreview">🚀</div>
       <label>Icono
         <div class="emoji-row" id="emojiRow"></div>
       </label>
-      <label>Nombre del entorno * <span class="hint">(título principal)</span><input type="text" id="fe-name" required placeholder="Ej: Ruta de progresión"/></label>
-      <label>Descripción rápida <span class="hint">(siempre en MAYÚSCULAS)</span>
+      <label for="fe-name">Nombre del entorno * <span class="hint">(título principal)</span><input type="text" id="fe-name" required placeholder="Ej: Ruta de progresión" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+" title="Solo letras, números, espacios y tildes" oninput="this.value = this.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]/g, '')"/></label>
+      <label for="fe-desc">Descripción rápida <span class="hint">(siempre en MAYÚSCULAS)</span>
         <input type="text" id="fe-desc" oninput="previewDesc()" placeholder="EJ: CARRERA IT · PLAN DE ESTUDIO 2026"/>
         <span class="desc-preview" id="descPreview"></span>
       </label>
@@ -114,7 +139,6 @@
   <div class="modal item-modal">
     <div class="modal-head">
       <div class="im-head-info"><h3 id="imTitle">Detalle del item</h3><span class="im-state" id="imState"></span></div>
-      <button class="modal-close" onclick="closeModal('itemModal')">✕</button>
     </div>
     <div class="tabs">
       <button type="button" class="tab active" data-tab="details" onclick="switchItemTab('details')">📋 Detalles</button>
@@ -124,10 +148,10 @@
     <form onsubmit="saveItem(event)">
       <div class="tab-panel active" id="panel-details">
         <input type="hidden" id="f-id"/>
-        <label>Título *<input type="text" id="f-title" required placeholder="Nombre del curso o skill"/></label>
-        <label>Detalle<textarea id="f-detail" rows="2" placeholder="Descripción breve"></textarea></label>
+        <label for="f-title">Título *<input type="text" id="f-title" required placeholder="Nombre del curso o skill"/></label>
+        <label for="f-detail">Detalle<textarea id="f-detail" rows="2" placeholder="Descripción breve"></textarea></label>
         <div class="form-row">
-          <label>Tiempo
+          <label for="f-time">Tiempo
             <div class="stepper">
               <button type="button" class="step-btn" onclick="stepVal('f-time',-1)">−</button>
               <input type="number" id="f-time" min="0" step="1" value="3" inputmode="numeric"/>
@@ -135,18 +159,21 @@
               <span class="time-suffix">h</span>
             </div>
           </label>
-          <label>Certificación<input type="text" id="f-cert" placeholder="Ej: PL-900"/></label>
+          <label for="f-impact">Impacto<select id="f-impact"><option value="Muy alto">Muy alto</option><option value="Alto" selected>Alto</option><option value="Medio">Medio</option><option value="Bajo">Bajo</option></select></label>
         </div>
         <div class="form-row">
-          <label>Impacto<select id="f-impact"><option>Medio</option><option>Medio-alto</option><option selected>Alto</option><option>Muy alto</option></select></label>
-          <label>URL<input type="url" id="f-url" placeholder="https://..."/></label>
+          <label for="f-cert">Tipo de certificado<input type="text" id="f-cert" placeholder="Ej: PL-900"/></label>
+          <label for="f-platform">Plataforma<input type="text" id="f-platform" placeholder="Ej: Coursera"/></label>
         </div>
-        <label>Columna<select id="f-col"></select></label>
+        <div class="form-row">
+          <label for="f-url">URL<input type="url" id="f-url" placeholder="https://..."/></label>
+          <label for="f-col">Columna<select id="f-col"></select></label>
+        </div>
       </div>
       <div class="tab-panel" id="panel-comments">
         <div class="comment-list" id="commentList"></div>
         <div class="comment-input-wrap" id="commentInputWrap">
-          <textarea id="f-comment" rows="2" placeholder="Escribe un comentario, nota o avance…"></textarea>
+          <textarea id="f-comment" aria-label="Escribe un comentario" rows="2" placeholder="Escribe un comentario, nota o avance…"></textarea>
         </div>
       </div>
       <div class="tab-panel" id="panel-activity">
@@ -170,7 +197,7 @@
       <input type="hidden" id="fc-id"/>
       
       <div class="form-group">
-        <label>Nombre de la columna <span class="req">*</span></label>
+        <label for="fc-name">Nombre de la columna <span class="req">*</span></label>
         <input type="text" id="fc-name" required placeholder="Ej: Cloud Computing" class="modern-input" />
       </div>
 

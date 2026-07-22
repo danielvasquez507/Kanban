@@ -16,3 +16,6 @@ services:
       - ./index.html:/app/index.html
       - ./app.js:/app/app.js
       - ./style.css:/app/style.css
+      - ./server.js:/app/server.js
+      - ./sw.js:/app/sw.js
+      - ./.env:/app/.env

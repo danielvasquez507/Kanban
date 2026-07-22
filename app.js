@@ -1,6 +1,53 @@
+/* ═══════════ AUTH & API ═══════════ */
+const originalFetch = window.fetch;
+window.fetch = async function() {
+  if (arguments[1]) {
+    arguments[1].credentials = 'include';
+  } else {
+    arguments[1] = { credentials: 'include' };
+  }
+  const res = await originalFetch.apply(this, arguments);
+  if (res.status === 401 && !arguments[0].includes('/api/login')) {
+    document.getElementById('appWrap').style.display = 'none';
+    document.getElementById('loginWrap').style.display = 'flex';
+  }
+  return res;
+};
+
+async function login(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  const pwd = document.getElementById('f-login-pwd').value;
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    });
+    if (res.ok) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = '';
+      document.getElementById('loginError').style.display = 'none';
+      loadApi();
+    } else {
+      document.getElementById('loginError').textContent = 'Contraseña incorrecta';
+      document.getElementById('loginError').style.display = 'block';
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  btn.disabled = false;
+}
+
+async function logout() {
+  await fetch('/api/logout', { method: 'POST' });
+  location.reload();
+}
+
 /* ═══════════ DATA ═══════════ */
 const MAX_COLS=8;
-const COLORS=['#34d399','#22d3ee','#f87171','#3b82f6','#f472b6','#fb923c','#fbbf24','#a78bfa','#e879f9','#94a3b8','#4ade80','#f43f5e','#06b6d4','#8b5cf6','#84cc16','#14b8a6'];
+const COLORS=['#34d399','#22d3ee','#f87171','#3b82f6','#f472b6','#fb923c','#fbbf24','#a78bfa','#e879f9','#94a3b8','#f43f5e','#06b6d4','#8b5cf6','#84cc16','#ffd700','#c0c0c0','#000000','#ffffff','#b87333','#cd7f32'];
 const DEFAULT={activeEnv:'env-main',view:'board',envs:[{
  id:'env-main',name:'Ruta de progresión',desc:'CARRERA IT · PLAN DE ESTUDIO 2026',icon:'🚀',logs:[],
  columns:[
@@ -33,23 +80,71 @@ const DEFAULT={activeEnv:'env-main',view:'board',envs:[{
  ]}]};
 
 let DATA = JSON.parse(JSON.stringify(DEFAULT));
+function getSlug(name) { 
+  return String(name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, ''); 
+}
+function goHome() { if(DATA.envs && DATA.envs.length) switchEnv(DATA.envs[0].id); }
+
 async function loadApi() {
   try {
     const res = await fetch('/api/state');
+    if (res.status === 401) return; // intercepted by fetch
+    document.getElementById('appWrap').style.display = '';
     const state = await res.json();
     if (state.envs && state.envs.length > 0) {
-      DATA.activeEnv = state.activeEnv || state.envs[0].id;
       DATA.envs = state.envs;
+      const path = window.location.pathname;
+      const slug = path.substring(1);
+      
+      if (path === '/' || slug === 'index.html' || slug === '') {
+        DATA.activeEnv = state.envs[0].id;
+        DATA.notFound = false;
+        history.replaceState({id: DATA.activeEnv}, '', '/' + getSlug(state.envs[0].name));
+      } else {
+        const env = DATA.envs.find(e => getSlug(e.name) === slug);
+        if (env) {
+          DATA.activeEnv = env.id;
+          DATA.notFound = false;
+        } else {
+          DATA.notFound = true;
+        }
+      }
     } else {
       // Seed if empty
       const id = uid();
       await fetch('/api/envs', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name: 'Ruta de progresión'}) });
       DATA.envs[0].id = id;
+      DATA.activeEnv = id;
+      history.replaceState({id}, '', '/' + getSlug(DATA.envs[0].name));
     }
     render();
   } catch(e) {}
 }
 loadApi();
+
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.id) {
+    DATA.activeEnv = e.state.id;
+    DATA.notFound = false;
+    render();
+  } else if (DATA.envs && DATA.envs.length > 0) {
+    const slug = window.location.pathname.substring(1);
+    if (slug === '' || slug === 'index.html') {
+      DATA.activeEnv = DATA.envs[0].id;
+      DATA.notFound = false;
+      history.replaceState({id: DATA.activeEnv}, '', '/' + getSlug(DATA.envs[0].name));
+    } else {
+      const env = DATA.envs.find(env => getSlug(env.name) === slug);
+      if (env) {
+        DATA.activeEnv = env.id;
+        DATA.notFound = false;
+      } else {
+        DATA.notFound = true;
+      }
+    }
+    render();
+  }
+});
 function persist() { /* Optimistic UI, fetch handled in functions */ }
 
 function uid(){return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -124,29 +219,102 @@ function updateNav(){
 document.getElementById('boardScroll').addEventListener('scroll',updateNav);
 window.addEventListener('resize',updateNav);
 
+let isDragging = false;
+let dragged = false;
+let startX;
+let scrollLeft;
+const boardEl = document.getElementById('boardScroll');
+
+boardEl.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  dragged = false;
+  boardEl.classList.add('dragging');
+  startX = e.pageX - boardEl.offsetLeft;
+  scrollLeft = boardEl.scrollLeft;
+});
+boardEl.addEventListener('mouseleave', () => {
+  isDragging = false;
+  boardEl.classList.remove('dragging');
+});
+boardEl.addEventListener('mouseup', () => {
+  isDragging = false;
+  boardEl.classList.remove('dragging');
+});
+boardEl.addEventListener('mousemove', (e) => {
+  if(!isDragging) return;
+  dragged = true;
+  e.preventDefault();
+  const x = e.pageX - boardEl.offsetLeft;
+  const walk = (x - startX) * 1.5;
+  boardEl.scrollLeft = scrollLeft - walk;
+});
+boardEl.addEventListener('click', (e) => {
+  if(dragged) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+
 /* ═══════════ RENDER ═══════════ */
 let firstRender=true;
 function render(){
+  const _svgIcon = (c,d)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:3px"><path d="${d}"/></svg>`;
+  const IMP_ICONS = {
+    'Bajo': _svgIcon('var(--emerald)', 'M12 5v14M19 12l-7 7-7-7'),
+    'Medio': _svgIcon('var(--amber)', 'M4 12h16'),
+    'Alto': _svgIcon('var(--orange)', 'M12 19V5M5 12l7-7 7 7'),
+    'Muy alto': _svgIcon('var(--red)', 'M17 11l-5-5-5 5M17 18l-5-5-5 5')
+  };
+  const boardScroll=document.getElementById('boardScroll');
+  const listView=document.getElementById('listView');
+  const notFoundView=document.getElementById('notFoundView');
+  const navL=document.getElementById('navLeft'),navR=document.getElementById('navRight');
+  const quotesEl=document.querySelector('.quotes');
+  const statsEl=document.querySelector('.stats');
+  const metroEl=document.getElementById('metro');
+  const logEl=document.getElementById('logSection');
+
+  if(DATA.notFound) {
+    const hdr = document.querySelector('header'); if(hdr) hdr.style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'none';
+    boardScroll.style.display = 'none';
+    listView.style.display = 'none';
+    if(quotesEl) quotesEl.style.display = 'none';
+    if(statsEl) statsEl.style.display = 'none';
+    if(metroEl) metroEl.style.display = 'none';
+    if(logEl) logEl.style.display = 'none';
+    if(notFoundView) notFoundView.style.display = 'flex';
+    document.title = "404 No Encontrado - Kanban";
+    return;
+  }
+  
+  const hdr = document.querySelector('header'); if(hdr) hdr.style.display = '';
+  document.querySelector('.toolbar').style.display = 'flex';
+  if(notFoundView) notFoundView.style.display = 'none';
+  if(quotesEl) quotesEl.style.display = 'block';
+  if(statsEl) statsEl.style.display = '';
+  if(metroEl) metroEl.style.display = '';
+  if(logEl) logEl.style.display = '';
+
   const env=curEnv(),cols=sortedCols(env);
   document.getElementById('envKicker').textContent=env.desc||'PLAN DE ESTUDIO';
   document.getElementById('envTitle').textContent=env.name;
   document.getElementById('envSwitchBtn').textContent=env.icon||'🏢';
   document.title=env.name+' — Panel IT';
-  document.getElementById('routeLine').innerHTML=cols.map((c,i)=>
-    `<b style="color:${c.color}">${c.name.toUpperCase().replace(/ · /g,'·')}</b>${i<cols.length-1?'<span class="sep">⟷</span>':''}`).join('');
-
   const colStats=cols.map(c=>{
     const items=env.items.filter(it=>it.col===c.id);
     const done=items.filter(it=>it.state===2).length;
     return{c,total:items.length,done,frac:items.length?done/items.length:0,complete:items.length>0&&done===items.length};
   });
   const metro=document.getElementById('metro');
-  metro.innerHTML=colStats.map((s,i)=>
-    `${i>0?`<div class="rail"><i style="transform:scaleX(${colStats[i-1].frac.toFixed(3)})"></i></div>`:''}
-    <div class="station${s.complete?' done':''}" data-cat="${s.c.id}" style="--c:${s.c.color};--p:${s.frac.toFixed(3)}" title="${s.c.name}: ${s.done}/${s.total}"><span class="dot"></span><span class="lbl">${s.c.name.split(' ')[0].toUpperCase()}</span></div>`
-  ).join('');
-  const cur=colStats.find(s=>s.total>0&&!s.complete);
-  if(cur){const st=metro.querySelector(`.station[data-cat="${cur.c.id}"]`);if(st)st.classList.add('current');}
+  if(metro){
+    metro.innerHTML=colStats.map((s,i)=>
+      `<div class="station${s.complete?' done':''}" data-cat="${s.c.id}" style="--c:${s.c.color};--p:${s.frac.toFixed(3)}" title="${s.c.name}: ${s.done}/${s.total}">
+        <span class="dot"></span>
+        <span class="lbl" style="color:${s.c.color}">${s.c.name.toUpperCase().replace(/ · /g,'·')}</span>
+      </div>${i<colStats.length-1?'<span class="sep">⟷</span>':''}`
+    ).join('');
+  }
 
   /* flat + next (común a ambas vistas) */
   const flat=[];
@@ -157,9 +325,6 @@ function render(){
   const view=DATA.view||'board';
   document.getElementById('viewBoard').classList.toggle('active',view==='board');
   document.getElementById('viewList').classList.toggle('active',view==='list');
-  const boardScroll=document.getElementById('boardScroll');
-  const listView=document.getElementById('listView');
-  const navL=document.getElementById('navLeft'),navR=document.getElementById('navRight');
 
   if(view==='board'){
     boardScroll.style.display='';listView.style.display='none';navL.style.display='';navR.style.display='';
@@ -168,19 +333,22 @@ function render(){
     board.innerHTML='';
     cols.forEach((c,ci)=>{
       const items=flat.filter(it=>it.col===c.id);
+      const IMP_ORDER = {'Muy alto':4, 'Alto':3, 'Medio':2, 'Bajo':1};
+      items.sort((a,b) => (a.state===2 ? 1 : 0) - (b.state===2 ? 1 : 0) || (IMP_ORDER[b.impact]||0) - (IMP_ORDER[a.impact]||0));
       const done=items.filter(it=>it.state===2).length;
       const sec=document.createElement('section');
       sec.className='col';sec.style.setProperty('--c',c.color);sec.style.setProperty('--rgb',hexToRgb(c.color));
-      let html=`<div class="col-head"><span class="idx">${String(c.num).padStart(2,'0')}</span><h3>${c.icon} ${c.name}</h3><span class="cnt">${done}/${items.length}</span><button class="col-edit" onclick="openColModal('${c.id}')" title="Editar columna">✎</button></div>
-      <button class="add-item-btn" onclick="openItemModal(null,'${c.id}')">+ Añadir item</button>`;
+      let html=`<div class="col-head"><span class="idx">${String(c.num).padStart(2,'0')}</span><h3>${c.icon} ${c.name}</h3><span class="cnt">${done}/${items.length}</span><button class="col-edit" onclick="openColModal('${c.id}')" title="Editar columna"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button><button class="col-edit" onclick="openItemModal(null,'${c.id}')" title="Añadir item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>`;
       items.forEach((it,ii)=>{
         const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
+        const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
+        const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
+        const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
         html+=`<article class="card st${it.state}" data-id="${it.id}" style="animation-delay:${ci*70+ii*50}ms" onclick="openItemModal('${it.id}')">
-          <div class="card-head"><h4>${escapeHtml(it.title)}</h4>${linkHtml}
-            <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button>
-            <button class="ibtn" onclick="event.stopPropagation();openItemModal('${it.id}')" title="Editar">✎</button></div>
+          <div class="card-head"><h4>${escapeHtml(it.title)}</h4>
+            <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button></div>
           <div class="card-body">
-            <div class="meta-row"><span class="m">⏱ ${it.time} h</span><span class="m">📜 ${escapeHtml(it.cert)}</span><span class="m">🎯 ${escapeHtml(it.impact)}</span></div>
+            <div class="meta-row"><span class="m">⏱ ${it.time} h</span>${crt}${imp}${linkHtml}</div>
             <div class="chips"></div>
             <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'✓ Completar'}</button>
           </div></article>`;
@@ -229,22 +397,26 @@ function renderList(flat,cols,next){
   let html='';
   cols.forEach(c=>{
     const items=flat.filter(it=>it.col===c.id);
-    const done=items.filter(it=>it.state===2).length;
+    const IMP_ORDER = {'Muy alto':4, 'Alto':3, 'Medio':2, 'Bajo':1};
+    items.sort((a,b) => (a.state===2 ? 1 : 0) - (b.state===2 ? 1 : 0) || (IMP_ORDER[b.impact]||0) - (IMP_ORDER[a.impact]||0));
+    const done=items.filter(i=>i.state===2).length;
     html+=`<div class="list-group"><div class="list-group-head" style="--c:${c.color};--rgb:${hexToRgb(c.color)}"><span>${c.icon} ${escapeHtml(c.name)}</span><span class="list-group-cnt">${done}/${items.length}</span><button class="list-add" onclick="openItemModal(null,'${c.id}')" title="Añadir item">＋</button></div>`;
     if(!items.length) html+=`<div class="empty">// sin items en esta columna</div>`;
     items.forEach(it=>{
       const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
+      const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
+      const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
+      const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
       const stBtnCls=it.state===0?'start':it.state===1?'finish':'done';
       const stBtnIcon=it.state===0?'▶':'✓';
       html+=`<div class="list-row st${it.state}" style="--c:${c.color};--rgb:${hexToRgb(c.color)}" onclick="openItemModal('${it.id}')">
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
-          <div class="list-title"><h4>${escapeHtml(it.title)}</h4>${linkHtml}</div>
+          <div class="list-title"><h4>${escapeHtml(it.title)}</h4></div>
           <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${it.id===next?'<span class="chip next">SIGUIENTE ▸</span>':''}</div>
         </div>
         <div class="list-side">
-          <div class="list-meta"><span class="m">⏱ ${it.time} h</span><span class="m">📜 ${escapeHtml(it.cert)}</span><span class="m">🎯 ${escapeHtml(it.impact)}</span></div>
-          <div class="list-acts"><button class="list-ibtn" onclick="event.stopPropagation();openItemModal('${it.id}')" title="Editar / ver">✎</button></div>
+          <div class="list-meta"><span class="m">⏱ ${it.time} h</span>${crt}${imp}${linkHtml}</div>
         </div>
       </div>`;
     });
@@ -302,16 +474,17 @@ function openItemModal(id,presetCol){
     document.getElementById('f-detail').value=it.detail;
     document.getElementById('f-time').value=it.time;
     document.getElementById('f-cert').value=it.cert;
-    document.getElementById('f-impact').value=it.impact;
+    document.getElementById('f-platform').value=it.platform||'';
+    document.getElementById('f-impact').value=it.impact||'Bajo';
     document.getElementById('f-url').value=it.url;
     sel.value=it.col;
   }else{
     document.getElementById('imTitle').textContent='Nuevo item';
     document.getElementById('imState').innerHTML=`<span class="chip pending">NUEVO</span>`;
     document.getElementById('f-id').value='';
-    ['f-title','f-detail','f-cert','f-url'].forEach(f=>document.getElementById(f).value='');
+    ['f-title','f-detail','f-cert','f-platform','f-url'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('f-time').value=3;
-    document.getElementById('f-impact').value='Alto';
+    document.getElementById('f-impact').value='Bajo';
     if(presetCol)sel.value=presetCol;
   }
   document.getElementById('f-comment').value='';
@@ -412,13 +585,14 @@ function saveItem(e){
     detail:document.getElementById('f-detail').value.trim(),
     time:+document.getElementById('f-time').value||0,
     cert:document.getElementById('f-cert').value.trim()||'—',
+    platform:document.getElementById('f-platform').value.trim()||'',
     impact:document.getElementById('f-impact').value,
     url:document.getElementById('f-url').value.trim(),
     col:colId
   };
   if(id){
     const it=env.items.find(i=>i.id===id);if(!it)return;
-    const before={title:it.title,detail:it.detail,time:it.time,cert:it.cert,impact:it.impact,url:it.url,col:it.col};
+    const before={title:it.title,detail:it.detail,time:it.time,cert:it.cert,platform:it.platform,impact:it.impact,url:it.url,col:it.col};
     
 Object.assign(it,obj);
 fetch('/api/items/'+id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...obj, column_id: colId}) });
@@ -471,10 +645,18 @@ function renderEnvList(){
     </div>`;
   }).join('');
 }
-function switchEnv(id){DATA.activeEnv=id;persist();render();const e=curEnv();toast(`${e.icon} Entorno: ${e.name}`);}
+function switchEnv(id){
+  DATA.activeEnv=id;
+  DATA.notFound=false;
+  const e=curEnv();
+  history.pushState({id: e.id}, '', '/' + getSlug(e.name));
+  persist();
+  render();
+  toast(`${e.icon} Entorno: ${e.name}`);
+}
 
 /* ═══════════ FORMULARIO DE ENTORNO ═══════════ */
-const ENV_EMOJIS=['🚀','🌱','💼','🎓','📚','🧠','⚙️','🛡️','☁️','🏢','','🔬'];
+const ENV_EMOJIS=['🚀','🌱','💼','🎓','📚','🧠','⚙️','🛡️','☁️','🏢','🏠','🎯','💻','💰','📈','👦🏽','🚗','👩'];
 let selEnvIcon='🚀';
 function buildEmojiRow(){
   document.getElementById('emojiRow').innerHTML=ENV_EMOJIS.map(e=>
@@ -715,4 +897,4 @@ for(let i=0;i<7;i++){
 }
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(o=>o.classList.remove('open'))});
-render();
+// EOF
