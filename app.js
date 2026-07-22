@@ -45,6 +45,7 @@ async function logout() {
   location.reload();
 }
 
+
 /* ═══════════ DATA ═══════════ */
 const MAX_COLS=8;
 const COLORS=['#34d399','#22d3ee','#f87171','#3b82f6','#f472b6','#fb923c','#fbbf24','#a78bfa','#e879f9','#94a3b8','#f43f5e','#06b6d4','#8b5cf6','#84cc16','#ffd700','#c0c0c0','#000000','#ffffff','#b87333','#cd7f32'];

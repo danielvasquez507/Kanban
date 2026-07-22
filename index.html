@@ -69,7 +69,6 @@
     <button class="tbtn nav-btn" id="navLeft" onclick="scrollBoard(-1)" title="Desplazar a la izquierda">◀</button>
     <button class="tbtn nav-btn" id="navRight" onclick="scrollBoard(1)" title="Desplazar a la derecha">▶</button>
     <button class="tbtn" id="installBtn" onclick="installApp()" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Instalar app</button>
-    <button class="tbtn" onclick="logout()" title="Cerrar sesión" style="color:var(--red);margin-left:4px">✕ Salir</button>
   </div>
   <div class="board-scroll" id="boardScroll"><main class="board" id="board"></main></div>
   <div class="list-view" id="listView" style="display:none"></div>
@@ -102,6 +101,7 @@
     <div class="env-list" id="envList"></div>
     <div class="env-create-row">
       <button class="env-create-btn" onclick="closeModal('envSwitcher');openEnvModal()">+ Crear nuevo entorno</button>
+      <button class="logout-btn" onclick="logout()" style="margin-top:10px">✕ CERRAR SESIÓN</button>
     </div>
   </div>
 </div>
