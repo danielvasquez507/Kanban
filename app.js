@@ -287,7 +287,6 @@ function render(){
   /* flat + next (común a ambas vistas) */
   const flat=[];
   cols.forEach(c=>env.items.filter(it=>it.col===c.id).forEach(it=>flat.push(it)));
-  const next=(flat.find(it=>it.state!==2)||{}).id||null;
 
   /* toggle de vista */
   const view=DATA.view||'board';
@@ -328,12 +327,12 @@ function render(){
     else board.classList.add('loaded');
     flat.forEach(it=>{
       const card=board.querySelector(`.card[data-id="${it.id}"]`);if(!card)return;
-      card.querySelector('.chips').innerHTML=`<span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>`+(it.id===next?'<span class="chip next">SIGUIENTE ▸</span>':'');
+      card.querySelector('.chips').innerHTML=`<span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>`;
     });
     updateNav();
   }else{
     boardScroll.style.display='none';listView.style.display='';navL.style.display='none';navR.style.display='none';
-    renderList(flat,cols,next);
+    renderList(flat,cols);
   }
 
   const total=flat.length,done=flat.filter(it=>it.state===2).length;
@@ -360,7 +359,7 @@ function updateStats(flat,pct){
 }
 
 /* ═══════════ VISTA LISTA ═══════════ */
-function renderList(flat,cols,next){
+function renderList(flat,cols){
   const lv=document.getElementById('listView');
   let html='';
   cols.forEach(c=>{
@@ -381,7 +380,7 @@ function renderList(flat,cols,next){
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
           <div class="list-title"><h4>${escapeHtml(it.title)}</h4></div>
-          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${it.id===next?'<span class="chip next">SIGUIENTE ▸</span>':''}</div>
+          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span></div>
         </div>
         <div class="list-side">
           <div class="list-meta"><span class="m">⏱ ${it.time} h</span>${crt}${imp}${linkHtml}</div>
