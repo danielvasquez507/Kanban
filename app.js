@@ -317,7 +317,7 @@ function render(){
           <div class="card-body">
             <div class="meta-row">${crt}${linkHtml}</div>
             <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px;align-items:center"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
-            <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'✔ Completar'}</button>
+            <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>Completar'}</button>
           </div></article>`;
       });
       sec.innerHTML=html;
@@ -371,7 +371,7 @@ function renderList(flat,cols){
       const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
       const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
       const stBtnCls=it.state===0?'start':it.state===1?'finish':'done';
-      const stBtnIcon=it.state===0?'▶':'✔';
+      const stBtnIcon=it.state===0?'▶':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
       html+=`<div class="list-row st${it.state}" style="--c:${c.color};--rgb:${hexToRgb(c.color)}" onclick="openItemModal('${it.id}')">
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
