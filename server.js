@@ -114,6 +114,7 @@ const initDb = () => {
       state INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2)),
       comments TEXT NOT NULL DEFAULT '[]',
       activity TEXT NOT NULL DEFAULT '[]',
+      tasks TEXT NOT NULL DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE INDEX IF NOT EXISTS idx_items_column ON items(column_id);
@@ -153,6 +154,7 @@ const initDb = () => {
   addColumn('items', 'state', "INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2))");
   addColumn('items', 'comments', "TEXT NOT NULL DEFAULT '[]'");
   addColumn('items', 'activity', "TEXT NOT NULL DEFAULT '[]'");
+  addColumn('items', 'tasks', "TEXT NOT NULL DEFAULT '[]'");
   addColumn('items', 'created_at', "DATETIME DEFAULT CURRENT_TIMESTAMP");
 };
 
@@ -207,10 +209,11 @@ app.get('/api/state', (req, res) => {
       const envCols = columns.filter(c => c.env_id === env.id);
       const envColIds = envCols.map(c => c.id);
       const envItems = items.filter(i => envColIds.includes(i.column_id)).map(i => {
-        let parsedComments = [], parsedActivity = [];
+        let parsedComments = [], parsedActivity = [], parsedTasks = [];
         try { parsedComments = JSON.parse(i.comments || '[]'); } catch(e){}
         try { parsedActivity = JSON.parse(i.activity || '[]'); } catch(e){}
-        return { ...i, col: i.column_id, time: i.time_h, comments: parsedComments, activity: parsedActivity };
+        try { parsedTasks = JSON.parse(i.tasks || '[]'); } catch(e){}
+        return { ...i, col: i.column_id, time: i.time_h, comments: parsedComments, activity: parsedActivity, tasks: parsedTasks };
       });
       return { ...env, desc: 'PLAN DE ESTUDIO', logs: [], columns: envCols, items: envItems };
     });
@@ -385,16 +388,16 @@ app.patch('/api/items/:id', (req, res) => {
   }
 });
 
-// PATCH /api/items/:id/extras (comments & activity)
+// PATCH /api/items/:id/extras (comments, activity & tasks)
 app.patch('/api/items/:id/extras', (req, res) => {
   const { id } = req.params;
-  const { comments, activity } = req.body;
+  const { comments, activity, tasks } = req.body;
   try {
     const item = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
     if (!item) return res.status(404).json({ error: 'Not found' });
     
-    db.prepare('UPDATE items SET comments = COALESCE(?, comments), activity = COALESCE(?, activity) WHERE id = ?')
-      .run(comments, activity, id);
+    db.prepare('UPDATE items SET comments = COALESCE(?, comments), activity = COALESCE(?, activity), tasks = COALESCE(?, tasks) WHERE id = ?')
+      .run(comments, activity, tasks, id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

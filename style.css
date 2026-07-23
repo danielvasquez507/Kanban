@@ -398,3 +398,116 @@ input:-webkit-autofill:active{
     -webkit-text-fill-color: white !important;
     transition: background-color 5000s ease-in-out 0s;
 }
+
+/* TASKS MODULE */
+.task-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.task-group {
+  background: var(--bg0);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+}
+.task-item, .subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.subtask-item {
+  margin-top: 8px;
+  margin-left: 20px;
+  padding-left: 10px;
+  border-left: 2px solid var(--line);
+}
+.task-check {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  flex-shrink: 0;
+}
+.task-check:checked {
+  background: var(--success);
+  border-color: var(--success);
+}
+.task-check:checked::after {
+  content: '✓';
+  position: absolute;
+  color: #fff;
+  font-size: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+.task-text {
+  flex-grow: 1;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.task-text.done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.task-controls {
+  display: flex;
+  gap: 5px;
+}
+.task-controls button {
+  background: var(--bg2);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+.task-controls button:hover {
+  background: var(--line);
+}
+.task-controls button.del:hover {
+  background: var(--danger);
+  color: #fff;
+}
+.add-task-wrap {
+  display: flex;
+  gap: 10px;
+}
+.add-task-wrap input, .add-subtask-wrap input {
+  flex-grow: 1;
+  background: var(--bg0);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.add-subtask-wrap {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+.add-subtask-wrap button {
+  background: var(--primary);
+  border: none;
+  color: #fff;
+  padding: 0 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.add-subtask-wrap button:hover {
+  background: #3b82f6;
+}

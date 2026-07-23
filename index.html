@@ -148,7 +148,7 @@
   </div>
 </div>
 
-<!-- MODAL ITEM (3 pestañas: Detalles · Comentarios · Actividad) -->
+<!-- MODAL ITEM (4 pestañas: Detalles · Tareas · Comentarios · Actividad) -->
 <div class="modal-overlay" id="itemModal">
   <div class="modal item-modal">
     <div class="modal-head">
@@ -156,6 +156,7 @@
     </div>
     <div class="tabs">
       <button type="button" class="tab active" data-tab="details" onclick="switchItemTab('details')">📋 Detalles</button>
+      <button type="button" class="tab" data-tab="tasks" onclick="switchItemTab('tasks')">☑️ Tareas <span class="tab-count" id="taskCount">0</span></button>
       <button type="button" class="tab" data-tab="comments" onclick="switchItemTab('comments')">💬 Comentarios <span class="tab-count" id="commentCount">0</span></button>
       <button type="button" class="tab" data-tab="activity" onclick="switchItemTab('activity')">📊 Actividad <span class="tab-count" id="activityCount">0</span></button>
     </div>
@@ -184,6 +185,12 @@
           <label for="f-col">Columna<select id="f-col"></select></label>
         </div>
       </div>
+      <div class="tab-panel" id="panel-tasks">
+        <div class="task-list-container" id="taskList"></div>
+        <div class="add-task-wrap">
+          <input type="text" id="f-new-task" placeholder="Añadir una nueva tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addTask(document.getElementById('f-id').value);}">
+        </div>
+      </div>
       <div class="tab-panel" id="panel-comments">
         <div class="comment-list" id="commentList"></div>
         <div class="comment-input-wrap" id="commentInputWrap">
@@ -197,6 +204,7 @@
         <button type="button" class="btn-del" id="btnDelItem" onclick="deleteItem()">Eliminar</button>
         <div class="spacer"></div>
         <button type="button" class="btn-cancel" onclick="closeModal('itemModal')">Cancelar</button>
+        <button type="button" class="btn-add-comment" id="btnAddTask" onclick="addTask(document.getElementById('f-id').value)" style="display:none">＋ Tarea</button>
         <button type="button" class="btn-add-comment" id="btnAddComment" onclick="addComment()" style="display:none">＋ Comentario</button>
         <button type="submit" class="btn-save" id="btnSaveItem">Guardar</button>
       </div>

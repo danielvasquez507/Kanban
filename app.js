@@ -157,7 +157,8 @@ function syncItemExtra(id) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       comments: JSON.stringify(item.comments || []),
-      activity: JSON.stringify(item.activity || [])
+      activity: JSON.stringify(item.activity || []),
+      tasks: JSON.stringify(item.tasks || [])
     })
   });
 }
@@ -411,8 +412,7 @@ function cycleState(id,e){
   
   it.state=(it.state+1)%3;
   fetch('/api/items/'+id+'/state', { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({state: it.state}) });
-  pushActivity
-(it,{type:'state',oldVal:fmtVal('state',oldState,env),newVal:fmtVal('state',it.state,env)});
+  pushActivity(it,{type:'state',oldVal:fmtVal('state',oldState,env),newVal:fmtVal('state',it.state,env)});
   persist();
   if(it.state===2){toast(`${CHECK_SVG} ${escapeHtml(it.title)} completado`);log(`${CHECK_SVG} ${escapeHtml(it.title)} — completado`,'ok');
     if(e){const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top,colColor(it.col));}}
@@ -470,6 +470,7 @@ function openItemModal(id,presetCol){
   switchItemTab('details');
   renderComments();
   renderActivity();
+  renderTasks(id);
   document.getElementById('itemModal').classList.add('open');
 }
 function renderComments(){
@@ -909,4 +910,146 @@ function toggleStats(isAuto) {
     stats.classList.add('hidden');
     if(btn) btn.classList.add('closed');
   }
+}
+
+// === TASKS LOGIC ===
+function renderTasks(id) {
+  const env = curEnv(); if (!env) return;
+  const it = env.items.find(i => i.id === id); if (!it) return;
+  if (!it.tasks) it.tasks = [];
+  const list = document.getElementById('taskList');
+  document.getElementById('taskCount').textContent = it.tasks.length;
+  
+  if (it.tasks.length === 0) {
+    list.innerHTML = '<div class="empty">// no hay tareas asignadas</div>';
+    return;
+  }
+  
+  let html = '';
+  it.tasks.forEach((t, tIdx) => {
+    const tDone = t.completed ? 'checked' : '';
+    const tClass = t.completed ? 'done' : '';
+    html += `
+      <div class="task-group">
+        <div class="task-item">
+          <input type="checkbox" class="task-check" ${tDone} onchange="toggleTask('${id}', ${tIdx})">
+          <span class="task-text ${tClass}">${escapeHtml(t.title)}</span>
+          <div class="task-controls">
+            <button type="button" onclick="moveTask('${id}', ${tIdx}, -1)" title="Subir">⬆</button>
+            <button type="button" onclick="moveTask('${id}', ${tIdx}, 1)" title="Bajar">⬇</button>
+            <button type="button" class="del" onclick="deleteTask('${id}', ${tIdx})" title="Eliminar">🗑</button>
+          </div>
+        </div>
+        <div class="subtask-list">`;
+        
+    if (t.subtasks && t.subtasks.length > 0) {
+      t.subtasks.forEach((st, stIdx) => {
+        const stDone = st.completed ? 'checked' : '';
+        const stClass = st.completed ? 'done' : '';
+        html += `
+          <div class="subtask-item">
+            <input type="checkbox" class="task-check" ${stDone} onchange="toggleSubtask('${id}', ${tIdx}, ${stIdx})">
+            <span class="task-text ${stClass}">${escapeHtml(st.title)}</span>
+            <div class="task-controls">
+              <button type="button" onclick="moveSubtask('${id}', ${tIdx}, ${stIdx}, -1)" title="Subir">⬆</button>
+              <button type="button" onclick="moveSubtask('${id}', ${tIdx}, ${stIdx}, 1)" title="Bajar">⬇</button>
+              <button type="button" class="del" onclick="deleteSubtask('${id}', ${tIdx}, ${stIdx})" title="Eliminar">🗑</button>
+            </div>
+          </div>`;
+      });
+    }
+    
+    html += `
+          <div class="add-subtask-wrap">
+            <input type="text" id="f-new-subtask-${tIdx}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask('${id}', ${tIdx});}">
+            <button type="button" onclick="addSubtask('${id}', ${tIdx})">Añadir</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  list.innerHTML = html;
+}
+
+function addTask(id) {
+  const input = document.getElementById('f-new-task');
+  const title = input.value.trim();
+  if (!title) return;
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  if (!it.tasks) it.tasks = [];
+  it.tasks.push({ id: generateId(), title, completed: false, subtasks: [] });
+  input.value = '';
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function addSubtask(id, tIdx) {
+  const input = document.getElementById(`f-new-subtask-${tIdx}`);
+  const title = input.value.trim();
+  if (!title) return;
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  if (!it.tasks[tIdx].subtasks) it.tasks[tIdx].subtasks = [];
+  it.tasks[tIdx].subtasks.push({ id: generateId(), title, completed: false });
+  input.value = '';
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function toggleTask(id, tIdx) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  const t = it.tasks[tIdx];
+  t.completed = !t.completed;
+  const oldVal = t.completed ? 'Pendiente' : 'Completada';
+  const newVal = t.completed ? 'Completada' : 'Pendiente';
+  pushActivity(it, 'state', `Tarea: ${t.title}`, oldVal, newVal);
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function toggleSubtask(id, tIdx, stIdx) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  const st = it.tasks[tIdx].subtasks[stIdx];
+  st.completed = !st.completed;
+  const oldVal = st.completed ? 'Pendiente' : 'Completada';
+  const newVal = st.completed ? 'Completada' : 'Pendiente';
+  pushActivity(it, 'state', `Subtarea: ${st.title}`, oldVal, newVal);
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function deleteTask(id, tIdx) {
+  if (!confirm('¿Eliminar tarea?')) return;
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  it.tasks.splice(tIdx, 1);
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function deleteSubtask(id, tIdx, stIdx) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  it.tasks[tIdx].subtasks.splice(stIdx, 1);
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function moveTask(id, tIdx, dir) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  const arr = it.tasks;
+  if (tIdx + dir < 0 || tIdx + dir >= arr.length) return;
+  const temp = arr[tIdx];
+  arr[tIdx] = arr[tIdx + dir];
+  arr[tIdx + dir] = temp;
+  syncItemExtra(id);
+  renderTasks(id);
+}
+
+function moveSubtask(id, tIdx, stIdx, dir) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  const arr = it.tasks[tIdx].subtasks;
+  if (stIdx + dir < 0 || stIdx + dir >= arr.length) return;
+  const temp = arr[stIdx];
+  arr[stIdx] = arr[stIdx + dir];
+  arr[stIdx + dir] = temp;
+  syncItemExtra(id);
+  renderTasks(id);
 }
