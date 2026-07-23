@@ -136,6 +136,20 @@ const initDb = () => {
       created_at INTEGER NOT NULL
     );
   `);
+
+  // Auto-migrations: Agregar columnas si faltan en DBs antiguas (como la de producción)
+  const addColumn = (table, col, def) => {
+    try { db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`); } catch (e) {}
+  };
+  addColumn('environments', 'is_active', 'INTEGER DEFAULT 0');
+  addColumn('items', 'action', "TEXT NOT NULL DEFAULT ''");
+  addColumn('items', 'time_h', "INTEGER NOT NULL DEFAULT 0 CHECK (time_h >= 0)");
+  addColumn('items', 'cert', "TEXT NOT NULL DEFAULT '—'");
+  addColumn('items', 'platform', "TEXT NOT NULL DEFAULT ''");
+  addColumn('items', 'impact', "TEXT NOT NULL DEFAULT '' CHECK (impact IN ('','Bajo','Medio','Alto','Muy alto'))");
+  addColumn('items', 'url', "TEXT NOT NULL DEFAULT ''");
+  addColumn('items', 'state', "INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2))");
+  addColumn('items', 'created_at', "DATETIME DEFAULT CURRENT_TIMESTAMP");
 };
 
 initDb();
