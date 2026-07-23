@@ -227,6 +227,7 @@ window.addEventListener('resize',updateNav);
 let firstRender=true;
 const _svgIcon = (c,d)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+const REOPEN_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
 const IMP_ICONS = {
   'Bajo': _svgIcon('var(--emerald)', 'M12 5v14M19 12l-7 7-7-7'),
   'Medio': _svgIcon('var(--amber)', 'M4 12h16'),
@@ -314,7 +315,7 @@ function render(){
         const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
         html+=`<article class="card st${it.state}" data-id="${it.id}" style="animation-delay:${ci*70+ii*50}ms" onclick="openItemModal('${it.id}')">
           <div class="card-head"><h4>${escapeHtml(it.title)}</h4>
-            <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button></div>
+            <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">${REOPEN_SVG}</button></div>
           <div class="card-body">
             <div class="meta-row">${crt}${linkHtml}</div>
             <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px;align-items:center"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
@@ -402,7 +403,7 @@ function cycleState(id,e){
   if(it.state===2){toast(`${CHECK_SVG} ${escapeHtml(it.title)} completado`);log(`${CHECK_SVG} ${escapeHtml(it.title)} — completado`,'ok');
     if(e){const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top,colColor(it.col));}}
   else if(it.state===1){toast(`▶ En curso: ${escapeHtml(it.title)}`,'amber');log(`▶ ${escapeHtml(it.title)} — en curso`,'run');}
-  else log(`↺ ${escapeHtml(it.title)} — reabierto`,'rs');
+  else log(`${REOPEN_SVG} ${escapeHtml(it.title)} — reabierto`,'rs');
   render();
 }
 function reopenItem(id){
@@ -410,7 +411,7 @@ function reopenItem(id){
   const oldState=it.state;
   it.state=0;
   if(oldState!==0)pushActivity(it,{type:'state',oldVal:fmtVal('state',oldState,env),newVal:fmtVal('state',0,env)});
-  persist();log(`↺ ${escapeHtml(it.title)} — reabierto`,'rs');render();
+  persist();log(`${REOPEN_SVG} ${escapeHtml(it.title)} — reabierto`,'rs');render();
 }
 function colColor(cid){const c=curEnv().columns.find(c=>c.id===cid);return c?c.color:'#34d399';}
 
