@@ -259,13 +259,13 @@ app.post('/api/envs', (req, res) => {
 // PATCH /api/envs/:id
 app.patch('/api/envs/:id', (req, res) => {
   const { id } = req.params;
-  const { name, icon } = req.body;
+  const { name, icon, is_active } = req.body;
   try {
     const env = db.prepare('SELECT * FROM environments WHERE id = ?').get(id);
     if (!env) return res.status(404).json({ error: 'Not found' });
     
-    db.prepare('UPDATE environments SET name = ?, icon = ? WHERE id = ?')
-      .run(name || env.name, icon || env.icon, id);
+    db.prepare('UPDATE environments SET name = COALESCE(?, name), icon = COALESCE(?, icon), is_active = COALESCE(?, is_active) WHERE id = ?')
+      .run(name, icon, is_active, id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -310,7 +310,7 @@ app.post('/api/envs/:id/columns', (req, res) => {
 // PATCH /api/columns/:id
 app.patch('/api/columns/:id', (req, res) => {
   const { id } = req.params;
-  const { name, icon, color } = req.body;
+  const { name, icon, color, num } = req.body;
   try {
     const col = db.prepare('SELECT * FROM columns WHERE id = ?').get(id);
     if (!col) return res.status(404).json({ error: 'Not found' });
@@ -320,8 +320,8 @@ app.patch('/api/columns/:id', (req, res) => {
       if (isColorUsed) return res.status(409).json({ error: 'Color ya en uso en este entorno' });
     }
 
-    db.prepare('UPDATE columns SET name = ?, icon = ?, color = ? WHERE id = ?')
-      .run(name || col.name, icon || col.icon, color || col.color, id);
+    db.prepare('UPDATE columns SET name = COALESCE(?, name), icon = COALESCE(?, icon), color = COALESCE(?, color), num = COALESCE(?, num) WHERE id = ?')
+      .run(name, icon, color, num, id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
