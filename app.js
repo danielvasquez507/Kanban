@@ -220,45 +220,7 @@ function updateNav(){
 document.getElementById('boardScroll').addEventListener('scroll',updateNav);
 window.addEventListener('resize',updateNav);
 
-let isDragging = false;
-let dragged = false;
-let startX;
-let scrollLeft;
-const boardEl = document.getElementById('boardScroll');
 
-boardEl.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  dragged = false;
-  boardEl.classList.add('dragging');
-  startX = e.pageX - boardEl.offsetLeft;
-  scrollLeft = boardEl.scrollLeft;
-});
-boardEl.addEventListener('mouseleave', () => {
-  isDragging = false;
-  boardEl.classList.remove('dragging');
-});
-boardEl.addEventListener('mouseup', () => {
-  isDragging = false;
-  boardEl.classList.remove('dragging');
-});
-boardEl.addEventListener('mousemove', (e) => {
-  if(!isDragging) return;
-  const x = e.pageX - boardEl.offsetLeft;
-  const walk = (x - startX) * 1.5;
-  if(Math.abs(x - startX) > 5) {
-    dragged = true;
-  }
-  if(dragged) {
-    e.preventDefault();
-    boardEl.scrollLeft = scrollLeft - walk;
-  }
-});
-boardEl.addEventListener('click', (e) => {
-  if(dragged) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}, true);
 
 /* ═══════════ RENDER ═══════════ */
 let firstRender=true;
