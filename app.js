@@ -316,7 +316,7 @@ function render(){
             <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button></div>
           <div class="card-body">
             <div class="meta-row">${crt}${linkHtml}</div>
-            <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
+            <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px;align-items:center"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
             <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'✓ Completar'}</button>
           </div></article>`;
       });
@@ -376,7 +376,7 @@ function renderList(flat,cols){
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
           <div class="list-title"><h4>${escapeHtml(it.title)}</h4></div>
-          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
+          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px;align-items:center"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
         </div>
         <div class="list-side">
           <div class="list-meta">${crt}${linkHtml}</div>
