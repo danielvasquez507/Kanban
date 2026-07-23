@@ -258,14 +258,14 @@ boardEl.addEventListener('click', (e) => {
 
 /* ═══════════ RENDER ═══════════ */
 let firstRender=true;
+const _svgIcon = (c,d)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:3px"><path d="${d}"/></svg>`;
+const IMP_ICONS = {
+  'Bajo': _svgIcon('var(--emerald)', 'M12 5v14M19 12l-7 7-7-7'),
+  'Medio': _svgIcon('var(--amber)', 'M4 12h16'),
+  'Alto': _svgIcon('var(--orange)', 'M12 19V5M5 12l7-7 7 7'),
+  'Muy alto': _svgIcon('var(--red)', 'M17 11l-5-5-5 5M17 18l-5-5-5 5')
+};
 function render(){
-  const _svgIcon = (c,d)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:3px"><path d="${d}"/></svg>`;
-  const IMP_ICONS = {
-    'Bajo': _svgIcon('var(--emerald)', 'M12 5v14M19 12l-7 7-7-7'),
-    'Medio': _svgIcon('var(--amber)', 'M4 12h16'),
-    'Alto': _svgIcon('var(--orange)', 'M12 19V5M5 12l7-7 7 7'),
-    'Muy alto': _svgIcon('var(--red)', 'M17 11l-5-5-5 5M17 18l-5-5-5 5')
-  };
   const boardScroll=document.getElementById('boardScroll');
   const listView=document.getElementById('listView');
   const notFoundView=document.getElementById('notFoundView');
