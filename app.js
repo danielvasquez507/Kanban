@@ -309,14 +309,14 @@ function render(){
       items.forEach((it,ii)=>{
         const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
         const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
-        const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}" style="margin-left:auto">${IMP_ICONS[it.impact]}</span>` : '';
+        const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
         const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
         html+=`<article class="card st${it.state}" data-id="${it.id}" style="animation-delay:${ci*70+ii*50}ms" onclick="openItemModal('${it.id}')">
           <div class="card-head"><h4>${escapeHtml(it.title)}</h4>
             <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button></div>
           <div class="card-body">
-            <div class="meta-row"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}</div>
-            <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${imp}</div>
+            <div class="meta-row">${crt}${linkHtml}</div>
+            <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
             <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'✓ Completar'}</button>
           </div></article>`;
       });
@@ -368,7 +368,7 @@ function renderList(flat,cols){
     items.forEach(it=>{
       const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
       const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
-      const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}" style="margin-left:auto">${IMP_ICONS[it.impact]}</span>` : '';
+      const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
       const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
       const stBtnCls=it.state===0?'start':it.state===1?'finish':'done';
       const stBtnIcon=it.state===0?'▶':'✓';
@@ -376,10 +376,10 @@ function renderList(flat,cols){
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
           <div class="list-title"><h4>${escapeHtml(it.title)}</h4></div>
-          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${imp}</div>
+          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
         </div>
         <div class="list-side">
-          <div class="list-meta"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}</div>
+          <div class="list-meta">${crt}${linkHtml}</div>
         </div>
       </div>`;
     });
