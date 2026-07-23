@@ -20,7 +20,7 @@ if (fs.existsSync(envPath)) {
 }
 const MASTER_PWD = process.env.MASTER_PWD || '3.3.3.';
 
-const sessions = new Map();
+
 const SESSION_DURATION = 20 * 60 * 1000; // 20 minutes
 
 const parseCookies = (req) => {
@@ -38,14 +38,16 @@ const parseCookies = (req) => {
 const requireAuth = (req, res, next) => {
   const cookies = parseCookies(req);
   const token = cookies.auth_token;
-  if (!token || !sessions.has(token)) return res.status(401).json({error: 'Unauthorized'});
+  if (!token) return res.status(401).json({error: 'Unauthorized'});
   
-  const lastActive = sessions.get(token);
-  if (Date.now() - lastActive > SESSION_DURATION) {
-    sessions.delete(token);
+  const session = db.prepare('SELECT created_at FROM sessions WHERE token = ?').get(token);
+  if (!session) return res.status(401).json({error: 'Unauthorized'});
+  
+  if (Date.now() - session.created_at > SESSION_DURATION) {
+    db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
     return res.status(401).json({error: 'Session expired'});
   }
-  sessions.set(token, Date.now());
+  db.prepare('UPDATE sessions SET created_at = ? WHERE token = ?').run(Date.now(), token);
   next();
 };
 
@@ -128,6 +130,11 @@ const initDb = () => {
       text TEXT NOT NULL,
       author TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      token TEXT PRIMARY KEY,
+      created_at INTEGER NOT NULL
+    );
   `);
 };
 
@@ -147,7 +154,7 @@ app.post('/api/login', (req, res) => {
   const { password } = req.body;
   if (password === MASTER_PWD) {
     const token = crypto.randomBytes(32).toString('hex');
-    sessions.set(token, Date.now());
+    db.prepare('INSERT INTO sessions (token, created_at) VALUES (?, ?)').run(token, Date.now());
     res.cookie('auth_token', token, { httpOnly: true, maxAge: SESSION_DURATION, sameSite: 'strict' });
     res.json({ success: true });
   } else {
@@ -157,7 +164,7 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/logout', (req, res) => {
   const token = parseCookies(req).auth_token;
-  if (token) sessions.delete(token);
+  if (token) db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
   res.clearCookie('auth_token');
   res.json({ success: true });
 });
