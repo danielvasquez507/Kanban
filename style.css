@@ -115,7 +115,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.5vw,36px);l
 .m{display:inline-flex;align-items:center;justify-content:center;height:20px;box-sizing:border-box;font:600 9.5px var(--mono);color:#b9c6da;background:rgba(148,163,184,.08);border:1px solid var(--line);padding:0 7px;border-radius:4px}
 .chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;min-height:18px;align-items:center}
 .chip{display:inline-flex;align-items:center;justify-content:center;height:20px;box-sizing:border-box;font:700 8.5px var(--mono);letter-spacing:.1em;padding:0 7px;border-radius:3px}
-.chip.pending{color:var(--orange);border:1px dashed var(--orange)}
+.chip.pending{color:rgba(251,146,60,.75);border:1px dashed rgba(251,146,60,.4)}
 .chip.active{color:#0b1220;background:var(--amber);animation:blink 1.8s infinite}
 @keyframes blink{50%{opacity:.65}}
 .chip.done{color:#062b1d;background:var(--emerald)}
