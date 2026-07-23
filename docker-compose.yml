@@ -18,4 +18,6 @@ services:
       - ./style.css:/app/style.css
       - ./server.js:/app/server.js
       - ./sw.js:/app/sw.js
+      - ./manifest.json:/app/manifest.json
+      - ./icon.svg:/app/icon.svg
       - ./.env:/app/.env

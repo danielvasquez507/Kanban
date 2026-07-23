@@ -12,6 +12,7 @@
 <meta name="application-name" content="Kanban"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1730'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='%231e3a5f' stroke-width='3'/%3E%3Cpath d='M14 44 L28 30 L36 38 L50 20' fill='none' stroke='%2322d3ee' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.5'/%3E%3Ccircle cx='14' cy='44' r='5.5' fill='%2334d399'/%3E%3Ccircle cx='28' cy='30' r='5.5' fill='%2322d3ee'/%3E%3Ccircle cx='36' cy='38' r='5.5' fill='%23f472b6'/%3E%3Ccircle cx='50' cy='20' r='5.5' fill='%233b82f6'/%3E%3C/svg%3E"/>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1730'/%3E%3Crect x='2' y='2' width='60' height='60' rx='12' fill='none' stroke='%231e3a5f' stroke-width='3'/%3E%3Cpath d='M14 44 L28 30 L36 38 L50 20' fill='none' stroke='%2322d3ee' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.5'/%3E%3Ccircle cx='14' cy='44' r='5.5' fill='%2334d399'/%3E%3Ccircle cx='28' cy='30' r='5.5' fill='%2322d3ee'/%3E%3Ccircle cx='36' cy='38' r='5.5' fill='%23f472b6'/%3E%3Ccircle cx='50' cy='20' r='5.5' fill='%233b82f6'/%3E%3C/svg%3E"/>
+<link rel="manifest" href="manifest.json">
 <title>Ruta de progresión — Panel IT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,13 +29,16 @@
     <form id="loginForm" onsubmit="login(event)">
       <div style="text-align:center;font-size:32px;margin:10px 0">🔒</div>
       <label for="f-login-pwd">Contraseña maestra
-        <input type="password" id="f-login-pwd" required placeholder="••••••••">
+        <div style="position:relative">
+          <input type="password" id="f-login-pwd" required placeholder="••••••••" style="padding-right:35px">
+          <button type="button" onclick="const p=document.getElementById('f-login-pwd');if(p.type==='password'){p.type='text';this.innerText='👁️';}else{p.type='password';this.innerText='🙈';}" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:0" title="Mostrar/Ocultar">🙈</button>
+        </div>
       </label>
       <div id="loginError" style="color:var(--red);font-size:12px;text-align:center;display:none;margin-top:-5px"></div>
       <button type="submit" class="btn-save" style="margin-top:10px">Entrar</button>
     </form>
   </div>
-  <div style="position:absolute;bottom:10px;right:15px;color:var(--muted);font-size:11px;font-family:var(--mono);opacity:0.5">v0.1.28</div>
+  <div style="position:absolute;bottom:10px;right:15px;color:var(--muted);font-size:11px;font-family:var(--mono);opacity:0.5">v0.1.29</div>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none">
