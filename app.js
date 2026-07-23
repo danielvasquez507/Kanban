@@ -284,9 +284,6 @@ function render(){
         <span class="lbl" style="color:${s.c.color}">${s.c.name.toUpperCase().replace(/ · /g,'·')}</span>
       </div>${i<colStats.length-1?'<span class="sep">⟷</span>':''}`
     ).join('');
-    
-    const isHidden = document.querySelector('.stats') && document.querySelector('.stats').classList.contains('hidden');
-    metro.innerHTML += `<button class="stats-toggle ${isHidden?'closed':''}" id="statsToggleBtn" onclick="toggleStats()" title="Mostrar/Ocultar Estadísticas" style="margin-left:auto"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>`;
   }
 
   /* flat + next (común a ambas vistas) */
