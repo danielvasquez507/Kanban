@@ -315,8 +315,8 @@ function render(){
           <div class="card-head"><h4>${escapeHtml(it.title)}</h4>
             <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">↺</button></div>
           <div class="card-body">
-            <div class="meta-row"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}${imp}</div>
-            <div class="chips"></div>
+            <div class="meta-row"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}</div>
+            <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${imp}</div>
             <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'✓ Completar'}</button>
           </div></article>`;
       });
@@ -325,10 +325,6 @@ function render(){
     });
     if(firstRender){requestAnimationFrame(()=>board.classList.add('loaded'));firstRender=false;}
     else board.classList.add('loaded');
-    flat.forEach(it=>{
-      const card=board.querySelector(`.card[data-id="${it.id}"]`);if(!card)return;
-      card.querySelector('.chips').innerHTML=`<span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>`;
-    });
     updateNav();
   }else{
     boardScroll.style.display='none';listView.style.display='';navL.style.display='none';navR.style.display='none';
@@ -380,10 +376,10 @@ function renderList(flat,cols){
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
           <div class="list-title"><h4>${escapeHtml(it.title)}</h4></div>
-          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span></div>
+          <div class="list-sub"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>${imp}</div>
         </div>
         <div class="list-side">
-          <div class="list-meta"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}${imp}</div>
+          <div class="list-meta"><span class="m">⏱ ${it.time} h</span>${crt}${linkHtml}</div>
         </div>
       </div>`;
     });
