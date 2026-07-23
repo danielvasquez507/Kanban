@@ -863,3 +863,22 @@ for(let i=0;i<7;i++){
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(o=>o.classList.remove('open'))});
 // EOF
+function toggleStats() {
+  const stats = document.querySelector('.stats');
+  const btn = document.getElementById('statsToggleBtn');
+  if (stats.classList.contains('hidden')) {
+    stats.classList.remove('hidden');
+    btn.classList.remove('closed');
+    localStorage.setItem('statsHidden', 'false');
+  } else {
+    stats.classList.add('hidden');
+    btn.classList.add('closed');
+    localStorage.setItem('statsHidden', 'true');
+  }
+}
+if (localStorage.getItem('statsHidden') === 'true') {
+  const stats = document.querySelector('.stats');
+  const btn = document.getElementById('statsToggleBtn');
+  if (stats) stats.classList.add('hidden');
+  if (btn) btn.classList.add('closed');
+}
