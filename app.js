@@ -307,7 +307,7 @@ function render(){
       sec.className='col';sec.style.setProperty('--c',c.color);sec.style.setProperty('--rgb',hexToRgb(c.color));
       let html=`<div class="col-head"><span class="idx">${String(c.num).padStart(2,'0')}</span><h3>${c.icon} ${c.name}</h3><span class="cnt">${done}/${items.length}</span><button class="col-edit" onclick="openColModal('${c.id}')" title="Editar columna"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button><button class="col-edit" onclick="openItemModal(null,'${c.id}')" title="Añadir item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>`;
       items.forEach((it,ii)=>{
-        const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
+        const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace" style="margin-left:auto">🔗</a>`:'';
         const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
         const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
         const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
@@ -366,7 +366,7 @@ function renderList(flat,cols){
     html+=`<div class="list-group"><div class="list-group-head" style="--c:${c.color};--rgb:${hexToRgb(c.color)}"><span>${c.icon} ${escapeHtml(c.name)}</span><span class="list-group-cnt">${done}/${items.length}</span><button class="list-add" onclick="openItemModal(null,'${c.id}')" title="Añadir item">＋</button></div>`;
     if(!items.length) html+=`<div class="empty">// sin items en esta columna</div>`;
     items.forEach(it=>{
-      const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace">🔗</a>`:'';
+      const linkHtml=it.url?`<a class="lnk" href="${it.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir enlace" style="margin-left:auto">🔗</a>`:'';
       const plat = it.platform ? ' — ' + escapeHtml(it.platform) : '';
       const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
       const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
