@@ -112,7 +112,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.5vw,36px);l
 .ibtn.reopen{display:none;color:var(--emerald)}
 .card-body{margin-top:6px}
 .meta-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center}
-.m{font:600 9.5px var(--mono);color:#b9c6da;background:rgba(148,163,184,.08);border:1px solid var(--line);padding:3px 7px;border-radius:4px}
+.m{display:inline-flex;align-items:center;font:600 9.5px var(--mono);color:#b9c6da;background:rgba(148,163,184,.08);border:1px solid var(--line);padding:3px 7px;border-radius:4px}
 .chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;min-height:18px;align-items:center}
 .chip{font:700 8.5px var(--mono);letter-spacing:.1em;padding:3px 7px;border-radius:3px}
 .chip.pending{color:var(--muted);border:1px dashed rgba(148,163,184,.35)}

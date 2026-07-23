@@ -1,5 +1,5 @@
 // sw.js — cache offline para la PWA
-const CACHE='ruta-it-v42';
+const CACHE='ruta-it-v43';
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./manifest.json','./icon.svg'])));
   self.skipWaiting();
@@ -14,8 +14,10 @@ self.addEventListener('fetch',e=>{
 
   e.respondWith(
     caches.match(e.request).then(hit=>hit||fetch(e.request).then(res=>{
-      if(res.ok&&url.origin===location.origin)
-        caches.open(CACHE).then(c=>c.put(e.request,res.clone()));
+      if(res.ok&&url.origin===location.origin) {
+        const resClone = res.clone();
+        caches.open(CACHE).then(c=>c.put(e.request,resClone));
+      }
       return res;
     }).catch(()=>caches.match('./index.html')))
   );
