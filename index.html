@@ -30,7 +30,7 @@
       <div style="text-align:center;font-size:32px;margin:10px 0">🔒</div>
       <label for="f-login-pwd">Contraseña maestra
         <div style="position:relative">
-          <input type="password" id="f-login-pwd" required placeholder="••••••••" style="padding-right:35px">
+          <input type="password" id="f-login-pwd" required placeholder="••••••••" style="padding-right:35px; background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--line);">
           <button type="button" onclick="event.preventDefault(); const p=document.getElementById('f-login-pwd');if(p.type==='password'){p.type='text';this.innerText='👁️';}else{p.type='password';this.innerText='🙈';}" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:0;z-index:10;" title="Mostrar/Ocultar">🙈</button>
         </div>
       </label>

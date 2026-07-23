@@ -386,6 +386,5 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .not-found-view p{font-size:1.2rem;color:var(--muted);margin-bottom:20px;max-width:500px;line-height:1.5}
 
 /* ── Login ── */
-.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:900;background:#040812;backdrop-filter:blur(10px)}
-.login-wrap::before{content:'';position:absolute;inset:0;background:url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.03)"/></svg>');z-index:-1}
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:900;background:transparent;backdrop-filter:none}
 .login-modal{max-width:320px;z-index:1;padding:0 0 10px 0;width:100%}
