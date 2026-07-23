@@ -134,7 +134,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.5vw,36px);l
 .card.st2 .ibtn{font-size:15px;padding:5px 8px;opacity:.65}
 .card.st2 .ibtn:hover{opacity:1}
 .card.st2 .lnk, .card.st2 .ibtn:not(.reopen){display:none}
-.card.st2 h4::after{content:' ✓';color:var(--emerald)}
+
 .card.st2 .ibtn.reopen{display:inline-block}
 .card.st2:hover{opacity:1}
 

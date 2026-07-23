@@ -314,7 +314,7 @@ function render(){
         const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
         const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
         html+=`<article class="card st${it.state}" data-id="${it.id}" style="animation-delay:${ci*70+ii*50}ms" onclick="openItemModal('${it.id}')">
-          <div class="card-head"><h4>${escapeHtml(it.title)}</h4>
+          <div class="card-head"><h4>${escapeHtml(it.title)}${it.state===2?'<span style="color:var(--emerald)">'+CHECK_SVG.replace('margin-right:4px;','margin-left:4px;')+'</span>':''}</h4>
             <button class="ibtn reopen" onclick="event.stopPropagation();reopenItem('${it.id}')" title="Reabrir">${REOPEN_SVG}</button></div>
           <div class="card-body">
             <div class="meta-row">${crt}${linkHtml}</div>
