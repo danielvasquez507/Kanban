@@ -243,11 +243,15 @@ boardEl.addEventListener('mouseup', () => {
 });
 boardEl.addEventListener('mousemove', (e) => {
   if(!isDragging) return;
-  dragged = true;
-  e.preventDefault();
   const x = e.pageX - boardEl.offsetLeft;
   const walk = (x - startX) * 1.5;
-  boardEl.scrollLeft = scrollLeft - walk;
+  if(Math.abs(x - startX) > 5) {
+    dragged = true;
+  }
+  if(dragged) {
+    e.preventDefault();
+    boardEl.scrollLeft = scrollLeft - walk;
+  }
 });
 boardEl.addEventListener('click', (e) => {
   if(dragged) {
