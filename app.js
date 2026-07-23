@@ -203,7 +203,7 @@ function diffAndTrack(it,before,env){
 (function initPWA(){
   const ICON=document.querySelector('link[rel="icon"]').href;
   const start=location.href.split('#')[0];
-  const manifest={name:'Ruta de Progresión — Panel IT',short_name:'Ruta IT',description:'Tracker de estudios IT: badges, Power Platform, MS365, redes, seguridad y cloud',id:start,start_url:start,scope:location.pathname,display:'standalone',orientation:'any',background_color:'#060d1c',theme_color:'#060d1c',
+  const manifest={name:'Kanban',short_name:'Kanban',description:'Tracker de estudios IT: badges, Power Platform, MS365, redes, seguridad y cloud',id:start,start_url:start,scope:location.pathname,display:'standalone',orientation:'any',background_color:'#060d1c',theme_color:'#060d1c',
     icons:[{src:ICON,sizes:'any',type:'image/svg+xml',purpose:'any'},{src:ICON,sizes:'any',type:'image/svg+xml',purpose:'maskable'}]};
   const ml=document.createElement('link');ml.rel='manifest';
   ml.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(manifest));
