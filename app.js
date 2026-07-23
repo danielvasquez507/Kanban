@@ -90,6 +90,7 @@ async function loadApi() {
   try {
     const res = await fetch('/api/state');
     if (res.status === 401) return; // intercepted by fetch
+    document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('appWrap').style.display = '';
     const state = await res.json();
     if (state.envs && state.envs.length > 0) {
