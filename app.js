@@ -200,7 +200,7 @@ function diffAndTrack(it,before,env){
 })();
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false;});
-window.addEventListener('appinstalled',()=>toast('✓ App instalada — ¡a estudiar!'));
+window.addEventListener('appinstalled',()=>toast(CHECK_SVG+'App instalada — ¡a estudiar!'));
 function installApp(){
   if(!deferredPrompt){toast('Usa "Añadir a pantalla de inicio" del navegador','muted');return;}
   deferredPrompt.prompt();
@@ -226,6 +226,7 @@ window.addEventListener('resize',updateNav);
 /* ═══════════ RENDER ═══════════ */
 let firstRender=true;
 const _svgIcon = (c,d)=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 const IMP_ICONS = {
   'Bajo': _svgIcon('var(--emerald)', 'M12 5v14M19 12l-7 7-7-7'),
   'Medio': _svgIcon('var(--amber)', 'M4 12h16'),
@@ -317,7 +318,7 @@ function render(){
           <div class="card-body">
             <div class="meta-row">${crt}${linkHtml}</div>
             <div class="chips"><span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span><div style="margin-left:auto;display:flex;gap:5px;align-items:center"><span class="m">⏱ ${it.time} h</span>${imp}</div></div>
-            <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>Completar'}</button>
+            <button class="act ${it.state===0?'start':'finish'}" onclick="event.stopPropagation();cycleState('${it.id}',event)">${it.state===0?'▶ Iniciar':CHECK_SVG+'Completar'}</button>
           </div></article>`;
       });
       sec.innerHTML=html;
@@ -371,7 +372,7 @@ function renderList(flat,cols){
       const imp = (it.impact && IMP_ICONS[it.impact]) ? `<span class="m" title="Impacto: ${escapeHtml(it.impact)}">${IMP_ICONS[it.impact]}</span>` : '';
       const crt = (it.cert && it.cert !== '—' || it.platform) ? `<span class="m">📜 ${escapeHtml(it.cert==='—'?'':it.cert)}${plat}</span>` : '';
       const stBtnCls=it.state===0?'start':it.state===1?'finish':'done';
-      const stBtnIcon=it.state===0?'▶':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      const stBtnIcon=it.state===0?'▶':CHECK_SVG;
       html+=`<div class="list-row st${it.state}" style="--c:${c.color};--rgb:${hexToRgb(c.color)}" onclick="openItemModal('${it.id}')">
         <button class="list-state-btn ${stBtnCls}" onclick="event.stopPropagation();cycleState('${it.id}',event)" title="Cambiar estado">${stBtnIcon}</button>
         <div class="list-main">
@@ -398,10 +399,10 @@ function cycleState(id,e){
   pushActivity
 (it,{type:'state',oldVal:fmtVal('state',oldState,env),newVal:fmtVal('state',it.state,env)});
   persist();
-  if(it.state===2){toast(`✓ ${it.title} completado`);log(`✓ ${it.title} — completado`,'ok');
+  if(it.state===2){toast(`${CHECK_SVG} ${escapeHtml(it.title)} completado`);log(`${CHECK_SVG} ${escapeHtml(it.title)} — completado`,'ok');
     if(e){const r=e.target.getBoundingClientRect();burst(r.left+r.width/2,r.top,colColor(it.col));}}
-  else if(it.state===1){toast(`▶ En curso: ${it.title}`,'amber');log(`▶ ${it.title} — en curso`,'run');}
-  else log(`↺ ${it.title} — reabierto`,'rs');
+  else if(it.state===1){toast(`▶ En curso: ${escapeHtml(it.title)}`,'amber');log(`▶ ${escapeHtml(it.title)} — en curso`,'run');}
+  else log(`↺ ${escapeHtml(it.title)} — reabierto`,'rs');
   render();
 }
 function reopenItem(id){
@@ -409,7 +410,7 @@ function reopenItem(id){
   const oldState=it.state;
   it.state=0;
   if(oldState!==0)pushActivity(it,{type:'state',oldVal:fmtVal('state',oldState,env),newVal:fmtVal('state',0,env)});
-  persist();log(`↺ ${it.title} — reabierto`,'rs');render();
+  persist();log(`↺ ${escapeHtml(it.title)} — reabierto`,'rs');render();
 }
 function colColor(cid){const c=curEnv().columns.find(c=>c.id===cid);return c?c.color:'#34d399';}
 
@@ -562,7 +563,7 @@ fetch('/api/items/'+id, { method:'PATCH', headers:{'Content-Type':'application/j
 
     const n=diffAndTrack(it,before,env);
     persist();closeModal('itemModal');render();
-    if(n>0){log(`✎ ${obj.title} — ${n} cambio(s)`,'rs');toast('✓ Item actualizado');}
+    if(n>0){log(`✎ ${escapeHtml(obj.title)} — ${n} cambio(s)`,'rs');toast(CHECK_SVG+'Item actualizado');}
     else{toast('Sin cambios','muted');}
   }else{
     obj.id=uid();obj.state=0;obj.comments=[];obj.activity=[];
@@ -572,8 +573,8 @@ fetch('/api/columns/'+colId+'/items', { method:'POST', headers:{'Content-Type':'
 
     pushActivity(obj,{type:'create'});
     persist();closeModal('itemModal');render();
-    log(`+ ${obj.title} — creado en ${colName}`,'ok');
-    toast('✓ Item creado');
+    log(`+ ${escapeHtml(obj.title)} — creado en ${escapeHtml(colName)}`,'ok');
+    toast(CHECK_SVG+'Item creado');
   }
 }
 function deleteItem(){
@@ -585,7 +586,7 @@ env.items=env.items.filter(i=>i.id!==id);
 fetch('/api/items/'+id, { method:'DELETE' });
 
   persist();closeModal('itemModal');render();
-  log(`✕ ${it.title} — eliminado`,'rs');toast('Item eliminado','muted');
+  log(`✕ ${escapeHtml(it.title)} — eliminado`,'rs');toast('Item eliminado','muted');
 }
 
 /* ═══════════ SELECTOR DE ENTORNOS (popup) ═══════════ */
@@ -660,15 +661,15 @@ function saveEnv(e){
     icon:document.getElementById('fe-icon').value||'🚀'
   };
   if(id){const env=DATA.envs.find(x=>x.id===id);
-if(env)Object.assign(env,obj);log(`✎ Entorno "${obj.name}" editado`,'rs');
+if(env)Object.assign(env,obj);log(`✎ Entorno "${escapeHtml(obj.name)}" editado`,'rs');
 fetch('/api/envs/'+id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(obj) });
 }
   else{const env={id:uid(),...obj,columns:[],items:[],logs:[]};
-DATA.envs.push(env);DATA.activeEnv=env.id;log(`+ Entorno "${obj.name}" creado`,'ok');
+DATA.envs.push(env);DATA.activeEnv=env.id;log(`+ Entorno "${escapeHtml(obj.name)}" creado`,'ok');
 fetch('/api/envs', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(env) });
 }
   persist();closeModal('envModal');render();
-  toast(id?'✓ Entorno actualizado':'✓ Entorno creado');
+  toast(id?CHECK_SVG+'Entorno actualizado':CHECK_SVG+'Entorno creado');
 }
 function deleteEnv(){
   const id=document.getElementById('fe-id').value;
@@ -732,15 +733,15 @@ function saveCol(e){
   const env=curEnv(),id=document.getElementById('fc-id').value;
   const obj={name:document.getElementById('fc-name').value.trim(),num:id?env.columns.find(x=>x.id===id).num:env.columns.length+1,icon:document.getElementById('fc-icon').value.trim()||'📁',color:selColor};
   if(id){const c=env.columns.find(x=>x.id===id);
-if(c)Object.assign(c,obj);log(`✎ Columna "${obj.name}" editada`,'rs');
+if(c)Object.assign(c,obj);log(`✎ Columna "${escapeHtml(obj.name)}" editada`,'rs');
 fetch('/api/columns/'+id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(obj) });
 }
   else{obj.id=uid();
-env.columns.push(obj);log(`+ Columna "${obj.name}" creada`,'ok');
+env.columns.push(obj);log(`+ Columna "${escapeHtml(obj.name)}" creada`,'ok');
 fetch('/api/envs/'+env.id+'/columns', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(obj) });
 }
   persist();closeModal('colModal');render();
-  toast(id?'✓ Columna actualizada':'✓ Columna creada');
+  toast(id?CHECK_SVG+'Columna actualizada':CHECK_SVG+'Columna creada');
 }
 function deleteCol(){
   const env=curEnv(),id=document.getElementById('fc-id').value;
@@ -753,7 +754,7 @@ env.items=env.items.filter(i=>i.col!==id);
 fetch('/api/columns/'+id, { method:'DELETE' });
 
   persist();closeModal('colModal');render();
-  log(`✕ Columna "${c.name}" eliminada (${count} items)`,'rs');toast('Columna eliminada','muted');
+  log(`✕ Columna "${escapeHtml(c.name)}" eliminada (${count} items)`,'rs');toast('Columna eliminada','muted');
 }
 
 /* ═══════════ LOG POR TENANT + COLAPSABLE ═══════════ */
@@ -834,7 +835,7 @@ setInterval(()=>{showQuotes();typeTerm();},120000);
 
 /* ═══════════ TOAST + FX ═══════════ */
 function toast(msg,type=''){
-  const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;
+  const d=document.createElement('div');d.className='toast '+type;d.innerHTML=msg;
   document.getElementById('toasts').appendChild(d);
   setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),320)},3000);
 }
