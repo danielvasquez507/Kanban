@@ -112,6 +112,8 @@ const initDb = () => {
       impact TEXT NOT NULL DEFAULT '' CHECK (impact IN ('','Bajo','Medio','Alto','Muy alto')),
       url TEXT NOT NULL DEFAULT '',
       state INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2)),
+      comments TEXT NOT NULL DEFAULT '[]',
+      activity TEXT NOT NULL DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE INDEX IF NOT EXISTS idx_items_column ON items(column_id);
@@ -149,6 +151,8 @@ const initDb = () => {
   addColumn('items', 'impact', "TEXT NOT NULL DEFAULT '' CHECK (impact IN ('','Bajo','Medio','Alto','Muy alto'))");
   addColumn('items', 'url', "TEXT NOT NULL DEFAULT ''");
   addColumn('items', 'state', "INTEGER NOT NULL DEFAULT 0 CHECK (state IN (0,1,2))");
+  addColumn('items', 'comments', "TEXT NOT NULL DEFAULT '[]'");
+  addColumn('items', 'activity', "TEXT NOT NULL DEFAULT '[]'");
   addColumn('items', 'created_at', "DATETIME DEFAULT CURRENT_TIMESTAMP");
 };
 
@@ -203,7 +207,10 @@ app.get('/api/state', (req, res) => {
       const envCols = columns.filter(c => c.env_id === env.id);
       const envColIds = envCols.map(c => c.id);
       const envItems = items.filter(i => envColIds.includes(i.column_id)).map(i => {
-        return { ...i, col: i.column_id, time: i.time_h, comments: [], activity: [] };
+        let parsedComments = [], parsedActivity = [];
+        try { parsedComments = JSON.parse(i.comments || '[]'); } catch(e){}
+        try { parsedActivity = JSON.parse(i.activity || '[]'); } catch(e){}
+        return { ...i, col: i.column_id, time: i.time_h, comments: parsedComments, activity: parsedActivity };
       });
       return { ...env, desc: 'PLAN DE ESTUDIO', logs: [], columns: envCols, items: envItems };
     });
@@ -340,10 +347,10 @@ app.post('/api/columns/:id/items', (req, res) => {
 
   const id = generateId();
   try {
-    db.prepare(`INSERT INTO items (id, column_id, title, detail, action, time_h, cert, platform, impact, url, state) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(id, column_id, title, detail, action, time_h, cert, platform, impact, url, state);
-    res.status(201).json({ id, column_id, title, detail, action, time_h, cert, platform, impact, url, state });
+    db.prepare(`INSERT INTO items (id, column_id, title, detail, action, time_h, cert, platform, impact, url, state, comments, activity) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(id, column_id, title, detail, action, time_h, cert, platform, impact, url, state, '[]', '[]');
+    res.status(201).json({ id, column_id, title, detail, action, time_h, cert, platform, impact, url, state, comments: [], activity: [] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -372,6 +379,22 @@ app.patch('/api/items/:id', (req, res) => {
                 column_id = COALESCE(?, column_id)
                 WHERE id = ?`)
       .run(title, detail, action, time_h, cert, platform, impact, url, column_id, id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/items/:id/extras (comments & activity)
+app.patch('/api/items/:id/extras', (req, res) => {
+  const { id } = req.params;
+  const { comments, activity } = req.body;
+  try {
+    const item = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+    if (!item) return res.status(404).json({ error: 'Not found' });
+    
+    db.prepare('UPDATE items SET comments = COALESCE(?, comments), activity = COALESCE(?, activity) WHERE id = ?')
+      .run(comments, activity, id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

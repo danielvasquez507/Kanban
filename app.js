@@ -149,6 +149,19 @@ window.addEventListener('popstate', (e) => {
 });
 function persist() { /* Optimistic UI, fetch handled in functions */ }
 
+function syncItemExtra(id) {
+  const env = curEnv(); if (!env) return;
+  const item = env.items.find(i => i.id === id); if (!item) return;
+  fetch('/api/items/'+id+'/extras', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      comments: JSON.stringify(item.comments || []),
+      activity: JSON.stringify(item.activity || [])
+    })
+  });
+}
+
 function uid(){return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return`${r},${g},${b}`}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -172,6 +185,7 @@ function pushActivity(it,entry){
   entry.id=uid();entry.date=nowStr();
   it.activity.unshift(entry);
   it.activity=it.activity.slice(0,50);
+  syncItemExtra(it.id);
 }
 function diffAndTrack(it,before,env){
   const fields=['title','detail','time','cert','impact','url','col'];
@@ -525,19 +539,29 @@ function renderActivity(){
   const ac=item.activity||[];
   countEl.textContent=ac.length;
   list.innerHTML=ac.length?ac.map(a=>{
-    let body='';
-    if(a.type==='create') body=`<div class="activity-field">🆕 Item creado</div>`;
-    else if(a.type==='state') body=`<div class="activity-field">🔄 Cambio de estado</div><div class="activity-diff"><span class="val-old">${escapeHtml(a.oldVal)}</span><span class="val-arrow">→</span><span class="val-new">${escapeHtml(a.newVal)}</span></div>`;
+    let header='';
+    if(a.type==='create') header=`🆕 Item creado`;
+    else if(a.type==='state') header=`🔄 Cambio de estado`;
     else if(a.type==='comment'){
-      const lbl=a.action==='add'?'💬 Comentario añadido':a.action==='del'?'💬 Comentario eliminado':'💬 Comentario editado';
+      header=a.action==='add'?'💬 Comentario añadido':a.action==='del'?'💬 Comentario eliminado':'💬 Comentario editado';
       let diff='';
       if(a.action==='add') diff=`<div class="activity-diff"><span class="val-new">${trunc(a.text)}</span></div>`;
       else if(a.action==='del') diff=`<div class="activity-diff"><span class="val-old">${trunc(a.text)}</span></div>`;
       else diff=`<div class="activity-diff"><span class="val-old">${trunc(a.oldVal)}</span><span class="val-arrow">→</span><span class="val-new">${trunc(a.newVal)}</span></div>`;
-      body=`<div class="activity-field">${lbl}</div>${diff}`;
+      body=diff;
     }
-    else body=`<div class="activity-field">✎ ${escapeHtml(a.fieldLabel)}</div><div class="activity-diff"><span class="val-old">${escapeHtml(a.oldVal)}</span><span class="val-arrow">→</span><span class="val-new">${escapeHtml(a.newVal)}</span></div>`;
-    return `<div class="activity-item act-${a.type}"><div class="activity-date">${escapeHtml(a.date)}</div>${body}</div>`;
+    else {
+      header=`✎ ${escapeHtml(a.fieldLabel)}`;
+      body=`<div class="activity-diff"><span class="val-old">${escapeHtml(a.oldVal)}</span><span class="val-arrow">→</span><span class="val-new">${escapeHtml(a.newVal)}</span></div>`;
+    }
+    return `<div class="activity-item act-${a.type}">
+      <div style="display:flex; gap:6px; align-items:baseline; margin-bottom:4px;">
+        <div class="activity-field" style="margin-bottom:0;">${header}</div>
+        <div style="color:var(--muted); font-size:10px;">-</div>
+        <div class="activity-date" style="margin-bottom:0;">${escapeHtml(a.date)}</div>
+      </div>
+      ${body}
+    </div>`;
   }).join(''):'<div class="empty">// sin actividad registrada para este item</div>';
 }
 function saveItem(e){
