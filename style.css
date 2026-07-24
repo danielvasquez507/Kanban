@@ -399,197 +399,229 @@ input:-webkit-autofill:active{
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* TASKS MODULE (Notion Minimalist Style) */
+/* TASKS MODULE (Premium Glassmorphism Style) */
 .task-list-container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  max-height: 50vh;
+  gap: 16px;
+  max-height: 55vh;
   overflow-y: auto;
-  margin-bottom: 16px;
-  padding-right: 8px;
+  margin-bottom: 20px;
+  padding: 10px;
 }
 .task-list-container::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+}
+.task-list-container::-webkit-scrollbar-track {
+  background: transparent;
 }
 .task-list-container::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 4px;
-}
-.task-list-container:hover::-webkit-scrollbar-thumb {
   background: var(--line);
+  border-radius: 10px;
 }
 
 .task-group {
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 0;
-  transition: background 0.15s ease;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+  overflow: hidden;
+  position: relative;
+}
+.task-group::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--blue), var(--emerald));
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.task-group:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+.task-group:hover::before {
+  opacity: 1;
+}
+:root[data-theme='dark'] .task-group {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+:root[data-theme='dark'] .task-group:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .task-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.15s ease;
+  align-items: center;
+  gap: 14px;
 }
-.task-group:hover .task-item {
-  background: rgba(0, 0, 0, 0.03); /* subtle hover */
-}
-:root[data-theme='dark'] .task-group:hover .task-item {
-  background: rgba(255, 255, 255, 0.05);
+
+.subtask-list {
+  margin-top: 16px;
+  padding-left: 20px;
+  border-left: 2px dashed rgba(150, 150, 150, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .subtask-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 2px;
-  margin-left: 28px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.15s ease;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  transition: background 0.2s, border-color 0.2s;
 }
 .subtask-item:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
 }
-:root[data-theme='dark'] .subtask-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+:root[data-theme='dark'] .subtask-item {
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .task-check {
   appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--muted);
-  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
   cursor: pointer;
   position: relative;
   background: transparent;
   flex-shrink: 0;
-  margin-top: 4px;
-  transition: all 0.1s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 0 0 2px transparent;
 }
 .task-check:hover {
-  border-color: var(--ink);
+  border-color: var(--blue);
+  transform: scale(1.1);
 }
 .task-check:checked {
-  background: transparent;
-  border-color: var(--muted);
+  background: var(--emerald);
+  border-color: var(--emerald);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
 }
 .task-check:checked::after {
-  content: '✓';
+  content: '';
   position: absolute;
-  color: var(--muted);
-  font-size: 12px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-weight: bold;
+  top: 40%; left: 50%;
+  width: 5px; height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .task-text {
   flex-grow: 1;
   color: var(--ink);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
   word-break: break-word;
-  transition: color 0.15s;
-  padding-top: 1px;
+  transition: color 0.3s, opacity 0.3s;
 }
 .task-text.done {
   text-decoration: line-through;
   color: var(--muted);
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .task-controls {
   display: flex;
-  gap: 2px;
+  gap: 6px;
   opacity: 0;
-  transition: opacity 0.15s;
+  transform: translateX(10px);
+  transition: opacity 0.3s, transform 0.3s;
 }
 .task-item:hover .task-controls,
 .subtask-item:hover .task-controls {
   opacity: 1;
+  transform: translateX(0);
 }
 .task-controls button {
-  background: transparent;
-  border: none;
-  color: var(--muted);
+  background: rgba(150, 150, 150, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid transparent;
+  color: var(--ink);
   cursor: pointer;
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: 8px;
+  padding: 6px 8px;
   font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 .task-controls button:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--ink);
-}
-:root[data-theme='dark'] .task-controls button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(150, 150, 150, 0.2);
+  transform: translateY(-2px);
 }
 .task-controls button.del:hover {
-  color: var(--red);
+  background: var(--red);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .add-task-wrap {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 10px;
 }
 .add-task-wrap input, .add-subtask-wrap input {
   flex-grow: 1;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(150, 150, 150, 0.2);
   color: var(--ink);
-  padding: 6px 8px;
-  border-radius: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
   font-size: 14px;
-  transition: border-color 0.15s;
+  transition: all 0.3s;
 }
-.add-task-wrap input:hover, .add-subtask-wrap input:hover {
-  border-bottom-color: var(--line);
+:root[data-theme='dark'] .add-task-wrap input, :root[data-theme='dark'] .add-subtask-wrap input {
+  background: rgba(0, 0, 0, 0.2);
 }
 .add-task-wrap input:focus, .add-subtask-wrap input:focus {
   outline: none;
-  border-bottom-color: var(--ink);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .add-subtask-wrap {
   display: flex;
   gap: 10px;
   margin-top: 4px;
-  margin-left: 28px;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-.task-group:hover .add-subtask-wrap,
-.add-subtask-wrap:focus-within {
-  opacity: 1;
 }
 .add-subtask-wrap button {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  padding: 0 10px;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 12px;
+  background: linear-gradient(135deg, var(--blue), #2563eb);
+  border: none;
+  color: #fff;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 .add-subtask-wrap button:hover {
-  background: var(--bg1);
-  color: var(--ink);
-  border-color: var(--muted);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+.add-subtask-wrap button:active {
+  transform: translateY(0);
 }
 
 @media(max-width:550px) {
