@@ -979,7 +979,7 @@ function addTask(id) {
   if (!title) return;
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
   if (!it.tasks) it.tasks = [];
-  it.tasks.push({ id: generateId(), title, completed: false, subtasks: [] });
+  it.tasks.push({ id: uid(), title, completed: false, subtasks: [] });
   input.value = '';
   syncItemExtra(id);
   renderTasks(id);
@@ -991,7 +991,7 @@ function addSubtask(id, tIdx) {
   if (!title) return;
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
   if (!it.tasks[tIdx].subtasks) it.tasks[tIdx].subtasks = [];
-  it.tasks[tIdx].subtasks.push({ id: generateId(), title, completed: false });
+  it.tasks[tIdx].subtasks.push({ id: uid(), title, completed: false });
   input.value = '';
   syncItemExtra(id);
   renderTasks(id);
@@ -1056,6 +1056,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.55';
+const APP_VERSION = 'v0.1.56';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
