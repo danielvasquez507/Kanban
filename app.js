@@ -982,10 +982,10 @@ function renderTasks(id) {
           <div class="task-controls">
             <button type="button" onclick="editTask('${id}', ${tIdx})" title="Editar">✎</button>
             <button type="button" id="btn-add-st-btn-${tIdx}" onclick="showAddSubtask('${id}', ${tIdx})" title="Añadir subtarea">＋</button>
-            <button type="button" class="toggle-subtasks ${expanded}" onclick="toggleSubtaskVis('${id}', ${tIdx})" title="Subtareas"><span class="arrow">⮟</span>${stCount}</button>
+            <button type="button" class="del" onclick="deleteTask('${id}', ${tIdx})" title="Eliminar">🗑</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, -1)" title="Subir">⬆</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, 1)" title="Bajar">⬇</button>
-            <button type="button" class="del" onclick="deleteTask('${id}', ${tIdx})" title="Eliminar">🗑</button>
+            <button type="button" class="toggle-subtasks ${expanded}" onclick="toggleSubtaskVis('${id}', ${tIdx})" title="Subtareas"><span class="arrow">⮟</span>${stCount}</button>
           </div>
         </div>
         <div class="subtask-list ${collapsedClass}">`;
@@ -1228,6 +1228,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.77';
+const APP_VERSION = 'v0.1.78';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
