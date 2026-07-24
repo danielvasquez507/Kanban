@@ -1228,6 +1228,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.76';
+const APP_VERSION = 'v0.1.77';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
