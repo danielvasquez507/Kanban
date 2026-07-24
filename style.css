@@ -292,11 +292,11 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
 .tab-count{font:700 9px var(--mono);background:rgba(34,211,238,.15);color:var(--cyan);padding:1px 7px;border-radius:99px;min-width:18px;text-align:center}
 .tab-panel{display:none}
-.tab-panel.active{display:flex;flex-direction:column;gap:12px;padding:16px 18px 6px;animation:tabIn .3s ease;min-height:100px}
+.tab-panel.active{display:flex;flex-direction:column;gap:12px;padding:16px 18px 6px;animation:tabIn .3s ease;min-height:360px}
 @keyframes tabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .item-modal .modal-actions{padding:14px 18px 18px;border-top:1px solid var(--line);margin-top:0}
 /* comentarios */
-.comment-list{display:flex;flex-direction:column;gap:3px;max-height:32vh;overflow-y:auto;padding-right:2px}
+.comment-list{display:flex;flex-direction:column;gap:3px;flex-grow:1;min-height:0;overflow-y:auto;padding-right:2px}
 .comment{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-left:2px solid var(--cyan);border-radius:5px;padding:4px 8px;background:rgba(34,211,238,.04);animation:tabIn .3s ease}
 .comment.editing{display:block;border-left-color:var(--amber);background:rgba(251,191,36,.05)}
 .comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:0px;gap:8px}
@@ -313,7 +313,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .comment-edit-actions .btn-save,.comment-edit-actions .btn-cancel{padding:7px 12px;font-size:10px}
 .comment-input-wrap{display:flex;flex-direction:column;gap:8px;margin-top:2px}
 /* actividad / auditoría */
-.activity-list{display:flex;flex-direction:column;gap:8px;max-height:42vh;overflow-y:auto;padding-right:2px}
+.activity-list{display:flex;flex-direction:column;gap:8px;flex-grow:1;min-height:0;overflow-y:auto;padding-right:2px}
 .activity-item{border:1px solid var(--line);border-left:2px solid var(--line);border-radius:6px;padding:8px 10px;background:rgba(148,163,184,.03);animation:tabIn .3s ease}
 .activity-item.act-create{border-left-color:var(--emerald);background:rgba(52,211,153,.05)}
 .activity-item.act-state{border-left-color:var(--cyan);background:rgba(34,211,238,.05)}
