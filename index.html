@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=0.1.62">
+<link rel="stylesheet" href="style.css?v=0.1.63">
 </head>
 <body>
 <div class="glow g1"></div><div class="glow g2"></div>
@@ -209,6 +209,18 @@
         <button type="submit" class="btn-save" id="btnSaveItem">Guardar</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-overlay" id="confirmModal" style="z-index: 10000;">
+  <div class="modal" style="max-width: 400px; padding: 24px;">
+    <h3 id="confirmTitle" style="margin-top: 0; color: var(--txt); font-family: var(--sans);">Confirmar</h3>
+    <p id="confirmMessage" style="color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px;">¿Estás seguro?</p>
+    <div class="modal-actions" style="margin-top: 0; justify-content: flex-end; gap: 12px;">
+      <button type="button" class="btn-cancel" onclick="closeModal('confirmModal')">Cancelar</button>
+      <button type="button" class="btn-del" id="btnConfirmDelete" style="margin-left: 0;">Eliminar</button>
+    </div>
   </div>
 </div>
 

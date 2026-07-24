@@ -712,6 +712,17 @@ fetch('/api/envs/'+id, { method:'DELETE' });
   persist();closeModal('envModal');render();
   toast('Entorno eliminado','muted');
 }
+function openConfirmModal(title, message, onConfirm) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  const btn = document.getElementById('btnConfirmDelete');
+  btn.onclick = () => {
+    onConfirm();
+    closeModal('confirmModal');
+  };
+  document.getElementById('confirmModal').classList.add('open');
+}
+
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 /* ═══════════ COL MODAL ═══════════ */
@@ -931,18 +942,24 @@ function renderTasks(id) {
   it.tasks.forEach((t, tIdx) => {
     const tDone = t.completed ? 'checked' : '';
     const tClass = t.completed ? 'done' : '';
+    const stCount = (t.subtasks && t.subtasks.length > 0) ? ` ${t.subtasks.length}` : '';
+    const expanded = t.expanded ? 'expanded' : '';
+    const collapsedClass = t.expanded ? '' : 'collapsed';
+    
     html += `
       <div class="task-group">
         <div class="task-item">
           <input type="checkbox" class="task-check" ${tDone} onchange="toggleTask('${id}', ${tIdx})">
-          <span class="task-text ${tClass}">${escapeHtml(t.title)}</span>
+          <span class="task-text ${tClass}" id="task-text-${tIdx}" ondblclick="editTask('${id}', ${tIdx})">${escapeHtml(t.title)}</span>
           <div class="task-controls">
+            <button type="button" onclick="editTask('${id}', ${tIdx})" title="Editar">✎</button>
+            <button type="button" class="toggle-subtasks ${expanded}" onclick="toggleSubtaskVis('${id}', ${tIdx})" title="Subtareas"><span class="arrow">⮟</span>${stCount}</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, -1)" title="Subir">⬆</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, 1)" title="Bajar">⬇</button>
             <button type="button" class="del" onclick="deleteTask('${id}', ${tIdx})" title="Eliminar">🗑</button>
           </div>
         </div>
-        <div class="subtask-list">`;
+        <div class="subtask-list ${collapsedClass}">`;
         
     if (t.subtasks && t.subtasks.length > 0) {
       t.subtasks.forEach((st, stIdx) => {
@@ -951,8 +968,9 @@ function renderTasks(id) {
         html += `
           <div class="subtask-item">
             <input type="checkbox" class="task-check" ${stDone} onchange="toggleSubtask('${id}', ${tIdx}, ${stIdx})">
-            <span class="task-text ${stClass}">${escapeHtml(st.title)}</span>
+            <span class="task-text ${stClass}" id="stask-text-${tIdx}-${stIdx}" ondblclick="editSubtask('${id}', ${tIdx}, ${stIdx})">${escapeHtml(st.title)}</span>
             <div class="task-controls">
+              <button type="button" onclick="editSubtask('${id}', ${tIdx}, ${stIdx})" title="Editar">✎</button>
               <button type="button" onclick="moveSubtask('${id}', ${tIdx}, ${stIdx}, -1)" title="Subir">⬆</button>
               <button type="button" onclick="moveSubtask('${id}', ${tIdx}, ${stIdx}, 1)" title="Bajar">⬇</button>
               <button type="button" class="del" onclick="deleteSubtask('${id}', ${tIdx}, ${stIdx})" title="Eliminar">🗑</button>
@@ -1020,18 +1038,88 @@ function toggleSubtask(id, tIdx, stIdx) {
 }
 
 function deleteTask(id, tIdx) {
-  if (!confirm('¿Eliminar tarea?')) return;
+  openConfirmModal('Eliminar Tarea', '¿Estás seguro de que deseas eliminar esta tarea?', () => {
+    const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+    it.tasks.splice(tIdx, 1);
+    syncItemExtra(id);
+    renderTasks(id);
+  });
+}
+
+function deleteSubtask(id, tIdx, stIdx) {
+  openConfirmModal('Eliminar Subtarea', '¿Estás seguro de que deseas eliminar esta subtarea?', () => {
+    const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+    it.tasks[tIdx].subtasks.splice(stIdx, 1);
+    syncItemExtra(id);
+    renderTasks(id);
+  });
+}
+
+function toggleSubtaskVis(id, tIdx) {
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
-  it.tasks.splice(tIdx, 1);
+  it.tasks[tIdx].expanded = !it.tasks[tIdx].expanded;
   syncItemExtra(id);
   renderTasks(id);
 }
 
-function deleteSubtask(id, tIdx, stIdx) {
+function editTask(id, tIdx) {
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
-  it.tasks[tIdx].subtasks.splice(stIdx, 1);
-  syncItemExtra(id);
-  renderTasks(id);
+  const t = it.tasks[tIdx];
+  const span = document.getElementById(`task-text-${tIdx}`);
+  if(!span) return;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'task-edit-input';
+  input.value = t.title;
+  
+  const save = () => {
+    const newTitle = input.value.trim();
+    if (newTitle && newTitle !== t.title) {
+      t.title = newTitle;
+      syncItemExtra(id);
+    }
+    renderTasks(id);
+  };
+  
+  input.onblur = save;
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') renderTasks(id);
+  };
+  
+  span.replaceWith(input);
+  input.focus();
+}
+
+function editSubtask(id, tIdx, stIdx) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  const st = it.tasks[tIdx].subtasks[stIdx];
+  const span = document.getElementById(`stask-text-${tIdx}-${stIdx}`);
+  if(!span) return;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'task-edit-input';
+  input.value = st.title;
+  
+  const save = () => {
+    const newTitle = input.value.trim();
+    if (newTitle && newTitle !== st.title) {
+      st.title = newTitle;
+      syncItemExtra(id);
+    }
+    renderTasks(id);
+  };
+  
+  input.onblur = save;
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') renderTasks(id);
+  };
+  
+  span.replaceWith(input);
+  input.focus();
 }
 
 function moveTask(id, tIdx, dir) {
@@ -1056,6 +1144,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.62';
+const APP_VERSION = 'v0.1.63';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;

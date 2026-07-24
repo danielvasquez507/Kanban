@@ -565,6 +565,29 @@ input:-webkit-autofill:active{
   background: rgba(59, 130, 246, 0.2);
 }
 
+.subtask-list.collapsed {
+  display: none;
+}
+
+.task-edit-input {
+  flex-grow: 1;
+  font: 400 12.5px var(--body);
+  background: var(--bg1);
+  border: 1px solid var(--blue);
+  color: var(--txt);
+  padding: 2px 6px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.toggle-subtasks .arrow {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.toggle-subtasks.expanded .arrow {
+  transform: rotate(180deg);
+}
+
 @media(max-width:550px) {
   .tab-label { display: none; }
 }
