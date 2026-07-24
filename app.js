@@ -437,6 +437,8 @@ function switchItemTab(tab){
   document.querySelectorAll('#itemModal .tab-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+tab));
   document.getElementById('btnSaveItem').style.display=(tab==='details')?'':'none';
   document.getElementById('btnAddComment').style.display=(tab==='comments'&&currentItemId)?'':'none';
+  const btnAddTask = document.getElementById('btnAddTask');
+  if(btnAddTask) btnAddTask.style.display=(tab==='tasks'&&currentItemId)?'':'none';
 }
 function openItemModal(id,presetCol){
   const env=curEnv(),sel=document.getElementById('f-col');
@@ -1054,6 +1056,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.53';
+const APP_VERSION = 'v0.1.54';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
