@@ -954,7 +954,7 @@ function renderTasks(id) {
           <span class="task-text ${tClass}" id="task-text-${tIdx}" ondblclick="editTask('${id}', ${tIdx})">${escapeHtml(t.title)}</span>
           <div class="task-controls">
             <button type="button" onclick="editTask('${id}', ${tIdx})" title="Editar">✎</button>
-            <button type="button" onclick="showAddSubtask('${id}', ${tIdx})" title="Añadir subtarea">＋</button>
+            <button type="button" id="btn-add-st-btn-${tIdx}" onclick="showAddSubtask('${id}', ${tIdx})" title="Añadir subtarea">＋</button>
             <button type="button" class="toggle-subtasks ${expanded}" onclick="toggleSubtaskVis('${id}', ${tIdx})" title="Subtareas"><span class="arrow">⮟</span>${stCount}</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, -1)" title="Subir">⬆</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, 1)" title="Bajar">⬇</button>
@@ -983,7 +983,7 @@ function renderTasks(id) {
     
     html += `
           <div class="add-subtask-wrap" id="add-st-wrap-${tIdx}" style="display: none;">
-            <input type="text" id="f-new-subtask-${tIdx}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask('${id}', ${tIdx});}" onblur="if(!this.value.trim()) document.getElementById('add-st-wrap-${tIdx}').style.display='none';">
+            <input type="text" id="f-new-subtask-${tIdx}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask('${id}', ${tIdx});}" onblur="if(!this.value.trim()) { document.getElementById('add-st-wrap-${tIdx}').style.display='none'; const b = document.getElementById('btn-add-st-btn-${tIdx}'); if(b) b.style.display=''; }">
             <button type="button" onclick="addSubtask('${id}', ${tIdx})">Añadir</button>
           </div>
         </div>
@@ -1045,6 +1045,8 @@ function showAddSubtask(id, tIdx) {
     const wrap = document.getElementById(`add-st-wrap-${tIdx}`);
     if (wrap) {
       wrap.style.display = 'flex';
+      const addBtn = document.getElementById(`btn-add-st-btn-${tIdx}`);
+      if (addBtn) addBtn.style.display = 'none';
       const input = document.getElementById(`f-new-subtask-${tIdx}`);
       if (input) input.focus();
     }
@@ -1199,6 +1201,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.72';
+const APP_VERSION = 'v0.1.73';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
