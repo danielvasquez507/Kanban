@@ -954,6 +954,7 @@ function renderTasks(id) {
           <span class="task-text ${tClass}" id="task-text-${tIdx}" ondblclick="editTask('${id}', ${tIdx})">${escapeHtml(t.title)}</span>
           <div class="task-controls">
             <button type="button" onclick="editTask('${id}', ${tIdx})" title="Editar">✎</button>
+            <button type="button" onclick="showAddSubtask('${id}', ${tIdx})" title="Añadir subtarea">＋</button>
             <button type="button" class="toggle-subtasks ${expanded}" onclick="toggleSubtaskVis('${id}', ${tIdx})" title="Subtareas"><span class="arrow">⮟</span>${stCount}</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, -1)" title="Subir">⬆</button>
             <button type="button" onclick="moveTask('${id}', ${tIdx}, 1)" title="Bajar">⬇</button>
@@ -981,8 +982,8 @@ function renderTasks(id) {
     }
     
     html += `
-          <div class="add-subtask-wrap">
-            <input type="text" id="f-new-subtask-${tIdx}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask('${id}', ${tIdx});}">
+          <div class="add-subtask-wrap" id="add-st-wrap-${tIdx}" style="display: none;">
+            <input type="text" id="f-new-subtask-${tIdx}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSubtask('${id}', ${tIdx});}" onblur="if(!this.value.trim()) document.getElementById('add-st-wrap-${tIdx}').style.display='none';">
             <button type="button" onclick="addSubtask('${id}', ${tIdx})">Añadir</button>
           </div>
         </div>
@@ -1029,10 +1030,34 @@ function handleAddTaskBtn() {
   }
 }
 
+function showAddSubtask(id, tIdx) {
+  const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
+  if (!it.tasks || !it.tasks[tIdx]) return;
+  
+  if (!it.tasks[tIdx].expanded) {
+    it.tasks.forEach((t, i) => { if (i !== tIdx) t.expanded = false; });
+    it.tasks[tIdx].expanded = true;
+    syncItemExtra(id);
+    renderTasks(id);
+  }
+  
+  setTimeout(() => {
+    const wrap = document.getElementById(`add-st-wrap-${tIdx}`);
+    if (wrap) {
+      wrap.style.display = 'flex';
+      const input = document.getElementById(`f-new-subtask-${tIdx}`);
+      if (input) input.focus();
+    }
+  }, 10);
+}
+
 function addSubtask(id, tIdx) {
   const input = document.getElementById(`f-new-subtask-${tIdx}`);
   const title = input.value.trim();
-  if (!title) return;
+  if (!title) {
+    document.getElementById(`add-st-wrap-${tIdx}`).style.display = 'none';
+    return;
+  }
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
   if (!it.tasks[tIdx].subtasks) it.tasks[tIdx].subtasks = [];
   it.tasks[tIdx].subtasks.push({ id: uid(), title, completed: false });
@@ -1174,6 +1199,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.71';
+const APP_VERSION = 'v0.1.72';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
