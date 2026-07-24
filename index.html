@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=0.1.73">
+<link rel="stylesheet" href="style.css?v=0.1.74">
 </head>
 <body>
 <div class="glow g1"></div><div class="glow g2"></div>
@@ -193,8 +193,8 @@
       </div>
       <div class="tab-panel" id="panel-comments">
         <div class="comment-list" id="commentList"></div>
-        <div class="comment-input-wrap" id="commentInputWrap">
-          <textarea id="f-comment" aria-label="Escribe un comentario" rows="2" placeholder="Escribe un comentario, nota o avance…"></textarea>
+        <div class="comment-input-wrap" id="commentInputWrap" style="display: none;">
+          <textarea id="f-comment" aria-label="Escribe un comentario" rows="2" placeholder="Escribe un comentario, nota o avance…" onblur="if(!this.value.trim()){ document.getElementById('commentInputWrap').style.display='none'; document.getElementById('btnAddComment').textContent='＋ Crear'; }"></textarea>
         </div>
       </div>
       <div class="tab-panel" id="panel-activity">
@@ -205,7 +205,7 @@
         <div class="spacer"></div>
         <button type="button" class="btn-cancel" onclick="closeModal('itemModal')">Cancelar</button>
         <button type="button" class="btn-add-comment" id="btnAddTask" onclick="handleAddTaskBtn()" style="display:none">＋ Crear</button>
-        <button type="button" class="btn-add-comment" id="btnAddComment" onclick="addComment()" style="display:none">＋ Guardar</button>
+        <button type="button" class="btn-add-comment" id="btnAddComment" onclick="handleAddCommentBtn()" style="display:none">＋ Crear</button>
         <button type="submit" class="btn-save" id="btnSaveItem">Guardar</button>
       </div>
     </form>

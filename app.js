@@ -508,12 +508,38 @@ function renderComments(){
   if(editingCommentId){const ta=document.getElementById('cedit-'+editingCommentId);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}}
 }
 function addComment(){
-  const ta=document.getElementById('f-comment');const txt=ta.value.trim();if(!txt)return;
+  const ta=document.getElementById('f-comment');const txt=ta.value.trim();
+  if(!txt) {
+    document.getElementById('commentInputWrap').style.display='none';
+    document.getElementById('btnAddComment').textContent='＋ Crear';
+    return;
+  }
   const item=curEnv().items.find(i=>i.id===currentItemId);if(!item)return;
   if(!item.comments)item.comments=[];
   item.comments.unshift({id:uid(),text:txt,date:nowStr()});
   pushActivity(item,{type:'comment',action:'add',text:txt});
-  persist();ta.value='';renderComments();renderActivity();toast('💬 Comentario añadido');
+  persist();ta.value='';
+  document.getElementById('commentInputWrap').style.display='none';
+  document.getElementById('btnAddComment').textContent='＋ Crear';
+  renderComments();renderActivity();toast('💬 Comentario añadido');
+}
+function handleAddCommentBtn() {
+  const wrap = document.getElementById('commentInputWrap');
+  const btn = document.getElementById('btnAddComment');
+  const input = document.getElementById('f-comment');
+  
+  if (wrap.style.display === 'none') {
+    wrap.style.display = 'flex';
+    input.focus();
+    btn.textContent = '＋ Guardar';
+  } else {
+    if (input.value.trim()) {
+      addComment();
+    } else {
+      wrap.style.display = 'none';
+      btn.textContent = '＋ Crear';
+    }
+  }
 }
 function editComment(cid){editingCommentId=cid;renderComments();}
 function cancelCommentEdit(){editingCommentId=null;renderComments();}
@@ -1201,6 +1227,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.73';
+const APP_VERSION = 'v0.1.74';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
