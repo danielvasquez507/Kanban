@@ -481,8 +481,9 @@ function renderComments(){
   const wrap=document.getElementById('commentInputWrap');
   const countEl=document.getElementById('commentCount');
   const item=currentItemId?curEnv().items.find(i=>i.id===currentItemId):null;
-  if(!item){list.innerHTML='<div class="empty">Guarda el item para poder añadir comentarios.</div>';wrap.style.display='none';countEl.textContent='0';return;}
-  wrap.style.display='';
+  if(!item){list.innerHTML='<div class="empty">Guarda el item para poder añadir comentarios.</div>';wrap.style.display='none';document.getElementById('btnAddComment').textContent='＋ Crear';countEl.textContent='0';return;}
+  wrap.style.display='none';
+  document.getElementById('btnAddComment').textContent='＋ Crear';
   const cs=item.comments||[];
   countEl.textContent=cs.length;
   list.innerHTML=cs.length?cs.map(c=>{
@@ -1227,6 +1228,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.74';
+const APP_VERSION = 'v0.1.75';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
