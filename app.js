@@ -498,12 +498,14 @@ function renderComments(){
       </div>`;
     }
     return `<div class="comment">
-      <div class="comment-meta"><span class="comment-date">${escapeHtml(c.date)}</span>
-        <span class="comment-btns">
+      <div class="comment-text">${escapeHtml(c.text)}</div>
+      <div class="comment-side">
+        <div class="comment-btns">
           <button class="comment-edit" onclick="editComment('${c.id}')" title="Editar">✎</button>
           <button class="comment-del" onclick="delComment('${c.id}')" title="Eliminar">✕</button>
-        </span></div>
-      <div class="comment-text">${escapeHtml(c.text)}</div>
+        </div>
+        <span class="comment-date">${escapeHtml(c.date)}</span>
+      </div>
     </div>`;
   }).join(''):'<div class="empty">// sin comentarios todavía — sé el primero</div>';
   if(editingCommentId){const ta=document.getElementById('cedit-'+editingCommentId);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}}
@@ -1228,6 +1230,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.78';
+const APP_VERSION = 'v0.1.79';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;

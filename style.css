@@ -297,8 +297,9 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .item-modal .modal-actions{padding:14px 18px 18px;border-top:1px solid var(--line);margin-top:0}
 /* comentarios */
 .comment-list{display:flex;flex-direction:column;gap:3px;max-height:32vh;overflow-y:auto;padding-right:2px}
-.comment{border:1px solid var(--line);border-left:2px solid var(--cyan);border-radius:5px;padding:2px 6px;background:rgba(34,211,238,.04);animation:tabIn .3s ease}
-.comment.editing{border-left-color:var(--amber);background:rgba(251,191,36,.05)}
+.comment{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-left:2px solid var(--cyan);border-radius:5px;padding:4px 8px;background:rgba(34,211,238,.04);animation:tabIn .3s ease}
+.comment.editing{display:block;border-left-color:var(--amber);background:rgba(251,191,36,.05)}
+.comment-side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;min-width:70px;flex-shrink:0}
 .comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:0px;gap:8px}
 .comment-date{font:600 9px var(--mono);letter-spacing:.08em;color:var(--muted)}
 .comment-btns{display:flex;gap:4px;flex-shrink:0}
@@ -307,7 +308,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .comment-edit:hover{opacity:1;color:var(--cyan);background:rgba(34,211,238,.1)}
 .comment-del{color:var(--muted)}
 .comment-del:hover{opacity:1;color:var(--red);background:rgba(248,113,113,.1)}
-.comment-text{font:400 12.5px var(--body);color:#d4deec;line-height:1.3;white-space:pre-wrap;word-break:break-word}
+.comment-text{flex:1;font:400 12.5px var(--body);color:#d4deec;line-height:1.3;white-space:pre-wrap;word-break:break-word}
 .comment-edit-area{min-height:44px}
 .comment-edit-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
 .comment-edit-actions .btn-save,.comment-edit-actions .btn-cancel{padding:7px 12px;font-size:10px}
