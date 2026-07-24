@@ -501,8 +501,8 @@ function renderComments(){
       <div class="comment-text">${escapeHtml(c.text)}</div>
       <span class="comment-date">${escapeHtml(c.date)}</span>
       <div class="comment-btns">
-        <button class="comment-edit" onclick="editComment('${c.id}')" title="Editar">✎</button>
-        <button class="comment-del" onclick="delComment('${c.id}')" title="Eliminar">🗑</button>
+        <button type="button" class="comment-edit" onclick="editComment('${c.id}')" title="Editar">✎</button>
+        <button type="button" class="comment-del" onclick="delComment('${c.id}')" title="Eliminar">🗑</button>
       </div>
     </div>`;
   }).join(''):'<div class="empty">// sin comentarios todavía — sé el primero</div>';
@@ -573,6 +573,7 @@ function renderActivity(){
   countEl.textContent=ac.length;
   list.innerHTML=ac.length?ac.map(a=>{
     let header='';
+    let body='';
     if(a.type==='create') header=`🆕 Item creado`;
     else if(a.type==='state') header=`🔄 Cambio de estado`;
     else if(a.type==='comment'){
@@ -725,7 +726,9 @@ fetch('/api/envs/'+id, { method:'PATCH', headers:{'Content-Type':'application/js
 DATA.envs.push(env);DATA.activeEnv=env.id;log(`+ Entorno "${escapeHtml(obj.name)}" creado`,'ok');
 fetch('/api/envs', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(env) });
 }
-  persist();closeModal('envModal');render();
+  persist();
+  if(document.getElementById('envSwitcher').classList.contains('open')) renderEnvList();
+  closeModal('envModal');render();
   toast(id?CHECK_SVG+'Entorno actualizado':CHECK_SVG+'Entorno creado');
 }
 function deleteEnv(){
@@ -736,7 +739,9 @@ function deleteEnv(){
     DATA.envs=DATA.envs.filter(x=>x.id!==id);
     fetch('/api/envs/'+id, { method:'DELETE' });
     if(DATA.activeEnv===id)DATA.activeEnv=DATA.envs[0].id;
-    persist();closeModal('envModal');render();
+    persist();
+    if(document.getElementById('envSwitcher').classList.contains('open')) renderEnvList();
+    closeModal('envModal');render();
     toast('Entorno eliminado','muted');
   });
 }
@@ -1227,6 +1232,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.85';
+const APP_VERSION = 'v0.1.86';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
