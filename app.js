@@ -949,7 +949,7 @@ function renderTasks(id) {
     
     html += `
       <div class="task-group">
-        <div class="task-item">
+        <div class="task-item" onclick="if(!event.target.closest('button') && event.target.tagName !== 'INPUT') toggleSubtaskVis('${id}', ${tIdx})">
           <input type="checkbox" class="task-check" ${tDone} onchange="toggleTask('${id}', ${tIdx})">
           <span class="task-text ${tClass}" id="task-text-${tIdx}" ondblclick="editTask('${id}', ${tIdx})">${escapeHtml(t.title)}</span>
           <div class="task-controls">
@@ -1170,6 +1170,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.69';
+const APP_VERSION = 'v0.1.70';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
