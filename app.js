@@ -995,13 +995,38 @@ function renderTasks(id) {
 function addTask(id) {
   const input = document.getElementById('f-new-task');
   const title = input.value.trim();
-  if (!title) return;
+  if (!title) {
+    document.querySelector('.add-task-wrap').style.display = 'none';
+    document.getElementById('btnAddTask').textContent = '＋ Crear';
+    return;
+  }
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
   if (!it.tasks) it.tasks = [];
   it.tasks.push({ id: uid(), title, completed: false, subtasks: [] });
   input.value = '';
+  document.querySelector('.add-task-wrap').style.display = 'none';
+  document.getElementById('btnAddTask').textContent = '＋ Crear';
   syncItemExtra(id);
   renderTasks(id);
+}
+
+function handleAddTaskBtn() {
+  const wrap = document.querySelector('.add-task-wrap');
+  const btn = document.getElementById('btnAddTask');
+  const input = document.getElementById('f-new-task');
+  
+  if (wrap.style.display === 'none') {
+    wrap.style.display = 'flex';
+    input.focus();
+    btn.textContent = '＋ Guardar';
+  } else {
+    if (input.value.trim()) {
+      addTask(document.getElementById('f-id').value);
+    } else {
+      wrap.style.display = 'none';
+      btn.textContent = '＋ Crear';
+    }
+  }
 }
 
 function addSubtask(id, tIdx) {
@@ -1145,6 +1170,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.68';
+const APP_VERSION = 'v0.1.69';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;

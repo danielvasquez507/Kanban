@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=0.1.68">
+<link rel="stylesheet" href="style.css?v=0.1.69">
 </head>
 <body>
 <div class="glow g1"></div><div class="glow g2"></div>
@@ -187,8 +187,8 @@
       </div>
       <div class="tab-panel" id="panel-tasks">
         <div class="task-list-container" id="taskList"></div>
-        <div class="add-task-wrap">
-          <input type="text" id="f-new-task" placeholder="Añadir una nueva tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addTask(document.getElementById('f-id').value);}">
+        <div class="add-task-wrap" style="display: none;">
+          <input type="text" id="f-new-task" placeholder="Añadir una nueva tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault();addTask(document.getElementById('f-id').value);}" onblur="if(!this.value.trim()){ document.querySelector('.add-task-wrap').style.display='none'; document.getElementById('btnAddTask').textContent='＋ Crear'; }">
         </div>
       </div>
       <div class="tab-panel" id="panel-comments">
@@ -204,7 +204,7 @@
         <button type="button" class="btn-del" id="btnDelItem" onclick="deleteItem()">Eliminar</button>
         <div class="spacer"></div>
         <button type="button" class="btn-cancel" onclick="closeModal('itemModal')">Cancelar</button>
-        <button type="button" class="btn-add-comment" id="btnAddTask" onclick="addTask(document.getElementById('f-id').value)" style="display:none">＋ Crear</button>
+        <button type="button" class="btn-add-comment" id="btnAddTask" onclick="handleAddTaskBtn()" style="display:none">＋ Crear</button>
         <button type="button" class="btn-add-comment" id="btnAddComment" onclick="addComment()" style="display:none">＋ Guardar</button>
         <button type="submit" class="btn-save" id="btnSaveItem">Guardar</button>
       </div>
