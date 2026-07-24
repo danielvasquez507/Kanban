@@ -499,12 +499,10 @@ function renderComments(){
     }
     return `<div class="comment">
       <div class="comment-text">${escapeHtml(c.text)}</div>
-      <div class="comment-side">
-        <div class="comment-btns">
-          <button class="comment-edit" onclick="editComment('${c.id}')" title="Editar">✎</button>
-          <button class="comment-del" onclick="delComment('${c.id}')" title="Eliminar">✕</button>
-        </div>
-        <span class="comment-date">${escapeHtml(c.date)}</span>
+      <span class="comment-date">${escapeHtml(c.date)}</span>
+      <div class="comment-btns">
+        <button class="comment-edit" onclick="editComment('${c.id}')" title="Editar">✎</button>
+        <button class="comment-del" onclick="delComment('${c.id}')" title="Eliminar">🗑</button>
       </div>
     </div>`;
   }).join(''):'<div class="empty">// sin comentarios todavía — sé el primero</div>';
@@ -1230,6 +1228,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.79';
+const APP_VERSION = 'v0.1.80';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;

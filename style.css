@@ -297,11 +297,10 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .item-modal .modal-actions{padding:14px 18px 18px;border-top:1px solid var(--line);margin-top:0}
 /* comentarios */
 .comment-list{display:flex;flex-direction:column;gap:3px;max-height:32vh;overflow-y:auto;padding-right:2px}
-.comment{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-left:2px solid var(--cyan);border-radius:5px;padding:4px 8px;background:rgba(34,211,238,.04);animation:tabIn .3s ease}
+.comment{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-left:2px solid var(--cyan);border-radius:5px;padding:4px 8px;background:rgba(34,211,238,.04);animation:tabIn .3s ease}
 .comment.editing{display:block;border-left-color:var(--amber);background:rgba(251,191,36,.05)}
-.comment-side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;min-width:70px;flex-shrink:0}
 .comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:0px;gap:8px}
-.comment-date{font:600 9px var(--mono);letter-spacing:.08em;color:var(--muted)}
+.comment-date{font:600 9px var(--mono);letter-spacing:.08em;color:var(--muted);white-space:nowrap;flex-shrink:0}
 .comment-btns{display:flex;gap:4px;flex-shrink:0}
 .comment-edit,.comment-del{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;gap:4px;box-sizing:border-box;background:none;border:none;cursor:pointer;font-size:15px;opacity:.5;transition:.2s;padding:4px;border-radius:4px}
 .comment-edit{color:var(--muted)}
