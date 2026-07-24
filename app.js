@@ -556,11 +556,13 @@ function saveCommentEdit(cid){
 }
 function delComment(cid){
   const item=curEnv().items.find(i=>i.id===currentItemId);if(!item)return;
-  const c=(item.comments||[]).find(x=>x.id===cid);const oldText=c?c.text:'';
-  item.comments=(item.comments||[]).filter(x=>x.id!==cid);
-  pushActivity(item,{type:'comment',action:'del',text:oldText});
-  if(editingCommentId===cid)editingCommentId=null;
-  persist();renderComments();renderActivity();
+  openConfirmModal('Eliminar comentario', '¿Estás seguro de que deseas eliminar este comentario?', () => {
+    const c=(item.comments||[]).find(x=>x.id===cid);const oldText=c?c.text:'';
+    item.comments=(item.comments||[]).filter(x=>x.id!==cid);
+    pushActivity(item,{type:'comment',action:'del',text:oldText});
+    if(editingCommentId===cid)editingCommentId=null;
+    persist();renderComments();renderActivity();
+  });
 }
 function renderActivity(){
   const list=document.getElementById('activityList');
@@ -636,13 +638,12 @@ fetch('/api/columns/'+colId+'/items', { method:'POST', headers:{'Content-Type':'
 function deleteItem(){
   const env=curEnv(),id=document.getElementById('f-id').value;
   const it=env.items.find(i=>i.id===id);if(!it)return;
-  if(!confirm(`¿Eliminar "${it.title}"?`))return;
-  
-env.items=env.items.filter(i=>i.id!==id);
-fetch('/api/items/'+id, { method:'DELETE' });
-
-  persist();closeModal('itemModal');render();
-  log(`✕ ${escapeHtml(it.title)} — eliminado`,'rs');toast('Item eliminado','muted');
+  openConfirmModal('Eliminar tarea', `¿Eliminar "${it.title}"?`, () => {
+    env.items=env.items.filter(i=>i.id!==id);
+    fetch('/api/items/'+id, { method:'DELETE' });
+    persist();closeModal('itemModal');render();
+    log(`✕ ${escapeHtml(it.title)} — eliminado`,'rs');toast('Item eliminado','muted');
+  });
 }
 
 /* ═══════════ SELECTOR DE ENTORNOS (popup) ═══════════ */
@@ -731,14 +732,13 @@ function deleteEnv(){
   const id=document.getElementById('fe-id').value;
   const e=DATA.envs.find(x=>x.id===id);if(!e)return;
   if(DATA.envs.length<=1){toast('Debe existir al menos un entorno','muted');return;}
-  if(!confirm(`¿Eliminar entorno "${e.name}" con ${e.columns.length} columnas y ${e.items.length} items?`))return;
-  
-DATA.envs=DATA.envs.filter(x=>x.id!==id);
-fetch('/api/envs/'+id, { method:'DELETE' });
-
-  if(DATA.activeEnv===id)DATA.activeEnv=DATA.envs[0].id;
-  persist();closeModal('envModal');render();
-  toast('Entorno eliminado','muted');
+  openConfirmModal('Eliminar entorno', `¿Eliminar entorno "${e.name}" con ${e.columns.length} columnas y ${e.items.length} items?`, () => {
+    DATA.envs=DATA.envs.filter(x=>x.id!==id);
+    fetch('/api/envs/'+id, { method:'DELETE' });
+    if(DATA.activeEnv===id)DATA.activeEnv=DATA.envs[0].id;
+    persist();closeModal('envModal');render();
+    toast('Entorno eliminado','muted');
+  });
 }
 function openConfirmModal(title, message, onConfirm) {
   document.getElementById('confirmTitle').textContent = title;
@@ -814,14 +814,13 @@ function deleteCol(){
   const env=curEnv(),id=document.getElementById('fc-id').value;
   const c=env.columns.find(x=>x.id===id);if(!c)return;
   const count=env.items.filter(i=>i.col===id).length;
-  if(!confirm(`¿Eliminar columna "${c.name}" y sus ${count} items?`))return;
-  env.columns=env.columns.filter(x=>x.id!==id);
-  
-env.items=env.items.filter(i=>i.col!==id);
-fetch('/api/columns/'+id, { method:'DELETE' });
-
-  persist();closeModal('colModal');render();
-  log(`✕ Columna "${escapeHtml(c.name)}" eliminada (${count} items)`,'rs');toast('Columna eliminada','muted');
+  openConfirmModal('Eliminar columna', `¿Eliminar columna "${c.name}" y sus ${count} items?`, () => {
+    env.columns=env.columns.filter(x=>x.id!==id);
+    env.items=env.items.filter(i=>i.col!==id);
+    fetch('/api/columns/'+id, { method:'DELETE' });
+    persist();closeModal('colModal');render();
+    log(`✕ Columna "${escapeHtml(c.name)}" eliminada (${count} items)`,'rs');toast('Columna eliminada','muted');
+  });
 }
 
 /* ═══════════ LOG POR TENANT + COLAPSABLE ═══════════ */
@@ -1228,6 +1227,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.84';
+const APP_VERSION = 'v0.1.85';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
