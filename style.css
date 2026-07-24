@@ -421,7 +421,7 @@ input:-webkit-autofill:active{
   border: 1px solid var(--line);
   border-left: 2px solid var(--blue);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: 0px 5px;
   background: rgba(59, 130, 246, 0.04);
   animation: tabIn 0.3s ease;
   display: flex;
