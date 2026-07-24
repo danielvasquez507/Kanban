@@ -403,8 +403,9 @@ input:-webkit-autofill:active{
 .task-list-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 32vh;
+  gap: 4px;
+  flex-grow: 1;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -420,12 +421,12 @@ input:-webkit-autofill:active{
   border: 1px solid var(--line);
   border-left: 2px solid var(--blue);
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   background: rgba(59, 130, 246, 0.04);
   animation: tabIn 0.3s ease;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 :root[data-theme='dark'] .task-group {
   background: rgba(59, 130, 246, 0.08);
@@ -534,6 +535,10 @@ input:-webkit-autofill:active{
   display: flex;
   gap: 8px;
   margin-top: 2px;
+}
+.add-task-wrap {
+  margin-top: auto;
+  margin-bottom: 0;
 }
 .add-task-wrap input, .add-subtask-wrap input {
   flex-grow: 1;
