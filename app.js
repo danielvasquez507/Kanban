@@ -448,6 +448,7 @@ function openItemModal(id,presetCol){
   editingCommentId=null;
   if(id){
     const it=env.items.find(i=>i.id===id);if(!it)return;
+    if(it.tasks) it.tasks.forEach(t => t.expanded = false);
     document.getElementById('imTitle').textContent=it.title||'Detalle del item';
     document.getElementById('imState').innerHTML=`<span class="chip ${STATE_CLS[it.state]}">${STATE_LABELS[it.state]}</span>`;
     document.getElementById('f-id').value=it.id;
@@ -1144,6 +1145,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.65';
+const APP_VERSION = 'v0.1.66';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;

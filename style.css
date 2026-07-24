@@ -441,16 +441,16 @@ input:-webkit-autofill:active{
 .subtask-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   margin-left: 22px;
-  padding-left: 8px;
+  padding-left: 4px;
   border-left: 1px solid var(--line);
 }
 
 .subtask-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .task-check {
