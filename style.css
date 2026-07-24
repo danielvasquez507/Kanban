@@ -429,7 +429,7 @@ input:-webkit-autofill:active{
   appearance: none;
   width: 18px;
   height: 18px;
-  border: 2px solid var(--text);
+  border: 2px solid var(--ink);
   border-radius: 4px;
   cursor: pointer;
   position: relative;
@@ -437,8 +437,8 @@ input:-webkit-autofill:active{
   flex-shrink: 0;
 }
 .task-check:checked {
-  background: var(--success);
-  border-color: var(--success);
+  background: var(--emerald);
+  border-color: var(--emerald);
 }
 .task-check:checked::after {
   content: '✓';
@@ -452,23 +452,23 @@ input:-webkit-autofill:active{
 }
 .task-text {
   flex-grow: 1;
-  color: var(--text);
+  color: var(--ink);
   font-size: 14px;
   line-height: 1.4;
   word-break: break-word;
 }
 .task-text.done {
   text-decoration: line-through;
-  color: var(--text-muted);
+  color: var(--muted);
 }
 .task-controls {
   display: flex;
   gap: 5px;
 }
 .task-controls button {
-  background: var(--bg2);
+  background: var(--bg1);
   border: none;
-  color: var(--text);
+  color: var(--ink);
   cursor: pointer;
   border-radius: 4px;
   padding: 4px 6px;
@@ -479,7 +479,7 @@ input:-webkit-autofill:active{
   background: var(--line);
 }
 .task-controls button.del:hover {
-  background: var(--danger);
+  background: var(--red);
   color: #fff;
 }
 .add-task-wrap {
@@ -490,7 +490,7 @@ input:-webkit-autofill:active{
   flex-grow: 1;
   background: var(--bg0);
   border: 1px solid var(--line);
-  color: var(--text);
+  color: var(--ink);
   padding: 8px 12px;
   border-radius: 8px;
 }
@@ -501,7 +501,7 @@ input:-webkit-autofill:active{
   margin-left: 20px;
 }
 .add-subtask-wrap button {
-  background: var(--primary);
+  background: var(--blue);
   border: none;
   color: #fff;
   padding: 0 12px;
