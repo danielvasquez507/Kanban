@@ -287,12 +287,12 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .im-head-info h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .im-state{flex-shrink:0}
 .tabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--line);background:rgba(148,163,184,.03);overflow-x:auto}
-.tab{font:700 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;padding:11px 13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.tab{font:700 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;padding:0px 10px;height:36px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .tab:hover{color:var(--ink)}
 .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
 .tab-count{font:700 9px var(--mono);background:rgba(34,211,238,.15);color:var(--cyan);padding:1px 7px;border-radius:99px;min-width:18px;text-align:center}
 .tab-panel{display:none}
-.tab-panel.active{display:flex;flex-direction:column;gap:12px;padding:16px 18px 6px;animation:tabIn .3s ease;min-height:360px}
+.tab-panel.active{display:flex;flex-direction:column;gap:12px;padding:16px 18px 6px;animation:tabIn .3s ease;min-height:100px}
 @keyframes tabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .item-modal .modal-actions{padding:14px 18px 18px;border-top:1px solid var(--line);margin-top:0}
 /* comentarios */
