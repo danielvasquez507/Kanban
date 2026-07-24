@@ -517,9 +517,16 @@ input:-webkit-autofill:active{
   font-size: 15px;
   opacity: 0.5;
   transition: 0.2s;
-  padding: 4px 6px;
+  padding: 4px;
   border-radius: 4px;
   color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  gap: 4px;
+  box-sizing: border-box;
 }
 .task-controls button:hover {
   opacity: 1;
