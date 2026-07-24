@@ -1083,7 +1083,11 @@ function deleteSubtask(id, tIdx, stIdx) {
 
 function toggleSubtaskVis(id, tIdx) {
   const env = curEnv(); const it = env.items.find(i => i.id === id); if (!it) return;
-  it.tasks[tIdx].expanded = !it.tasks[tIdx].expanded;
+  const isExpanding = !it.tasks[tIdx].expanded;
+  if (isExpanding) {
+    it.tasks.forEach((t, i) => { if (i !== tIdx) t.expanded = false; });
+  }
+  it.tasks[tIdx].expanded = isExpanding;
   syncItemExtra(id);
   renderTasks(id);
 }
@@ -1170,6 +1174,6 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   renderTasks(id);
 }
 
-const APP_VERSION = 'v0.1.70';
+const APP_VERSION = 'v0.1.71';
 const versionLabel = document.getElementById('appVersionLabel');
 if (versionLabel) versionLabel.textContent = APP_VERSION;
