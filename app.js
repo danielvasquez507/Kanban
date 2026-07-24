@@ -1053,3 +1053,7 @@ function moveSubtask(id, tIdx, stIdx, dir) {
   syncItemExtra(id);
   renderTasks(id);
 }
+
+const APP_VERSION = 'v0.1.52';
+const versionLabel = document.getElementById('appVersionLabel');
+if (versionLabel) versionLabel.textContent = APP_VERSION;

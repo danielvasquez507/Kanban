@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=0.1.29">
+<link rel="stylesheet" href="style.css?v=0.1.30">
 </head>
 <body>
 <div class="glow g1"></div><div class="glow g2"></div>
@@ -43,7 +43,7 @@
       <button type="submit" class="btn-save" style="margin-top:10px">Entrar</button>
     </form>
   </div>
-  <div style="position:absolute;bottom:10px;right:15px;color:var(--muted);font-size:11px;font-family:var(--mono);opacity:0.5">v0.1.52</div>
+  <div id="appVersionLabel" style="position:absolute;bottom:10px;right:15px;color:var(--muted);font-size:11px;font-family:var(--mono);opacity:0.5"></div>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none">
@@ -155,10 +155,10 @@
       <div class="im-head-info"><h3 id="imTitle">Detalle del item</h3><span class="im-state" id="imState"></span></div>
     </div>
     <div class="tabs">
-      <button type="button" class="tab active" data-tab="details" onclick="switchItemTab('details')">📋 Detalles</button>
-      <button type="button" class="tab" data-tab="tasks" onclick="switchItemTab('tasks')">☑️ Tareas <span class="tab-count" id="taskCount">0</span></button>
-      <button type="button" class="tab" data-tab="comments" onclick="switchItemTab('comments')">💬 Comentarios <span class="tab-count" id="commentCount">0</span></button>
-      <button type="button" class="tab" data-tab="activity" onclick="switchItemTab('activity')">📊 Actividad <span class="tab-count" id="activityCount">0</span></button>
+      <button type="button" class="tab active" data-tab="details" onclick="switchItemTab('details')">📋 <span class="tab-label">Detalles</span></button>
+      <button type="button" class="tab" data-tab="tasks" onclick="switchItemTab('tasks')">☑️ <span class="tab-label">Tareas</span> <span class="tab-count" id="taskCount">0</span></button>
+      <button type="button" class="tab" data-tab="comments" onclick="switchItemTab('comments')">💬 <span class="tab-label">Comentarios</span> <span class="tab-count" id="commentCount">0</span></button>
+      <button type="button" class="tab" data-tab="activity" onclick="switchItemTab('activity')">📊 <span class="tab-label">Actividad</span> <span class="tab-count" id="activityCount">0</span></button>
     </div>
     <form onsubmit="saveItem(event)">
       <div class="tab-panel active" id="panel-details">
@@ -253,6 +253,6 @@
   </div>
 </div>
 
-<script src="app.js?v=0.1.52"></script>
+<script src="app.js?v=0.1.53"></script>
 </body>
 </html>

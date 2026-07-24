@@ -281,7 +281,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .hint{text-transform:none;letter-spacing:0;font-weight:400}
 
 /* ── modal item con pestañas ── */
-.item-modal{max-width:520px}
+.item-modal{max-width:550px}
 .item-modal form{padding:0;gap:0}
 .im-head-info{display:flex;align-items:center;gap:10px;min-width:0}
 .im-head-info h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -510,4 +510,8 @@ input:-webkit-autofill:active{
 }
 .add-subtask-wrap button:hover {
   background: #3b82f6;
+}
+
+@media(max-width:550px) {
+  .tab-label { display: none; }
 }
